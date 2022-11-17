@@ -1,8 +1,8 @@
 import axios from "axios";
 import React, { useState } from "react";
-import PaymentResponse from "./PaymentResponse";
+import PaymentDetails from "./PaymentDetails";
 
-export default function PaymentRequest() {
+export default function MakePayment() {
   const [res, setRES] = useState("");
   const makePayment = async () => {
     const paymentData = new FormData();
@@ -23,7 +23,7 @@ export default function PaymentRequest() {
         Pay Now
       </button>
       {res}
-      {res !== null ? <PaymentResponse /> : <h3>Payment failed</h3>}
+      {res !== null ? <PaymentDetails /> : <h3>Payment failed</h3>}
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 
-export default function PaymentResponse() {
+export default function PaymentDetails() {
   const [res, setRES] = useState("");
   useEffect(() => {
     getResponse();
