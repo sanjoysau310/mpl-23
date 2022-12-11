@@ -1,43 +1,50 @@
+import axios from "axios";
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { TodoDataService } from "../../api/todo/TodoDataService";
+import { Link, useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
-  //const [username,setUsername] = useState("");
-  //const [password, setPassword]= useState("");
-
+  let navigate = useNavigate();
   const [user, setUser] = useState({
-    username: "",
+    email: "",
     password: "",
   });
+  const [message, setMessage] = useState("");
+  const { REACT_APP_API_URL } = process.env;
 
   const handleChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("details-", user);
-    TodoDataService.login(user).then((res) => {
-      console.log(res);
-    });
+    const result = await axios.post(`${REACT_APP_API_URL}/authuser`, user);
+    if (result.data === "Auth Successful") navigate("/home");
+    else {
+      setUser("");
+      setMessage("Please enter correct credentials!!!");
+    }
   };
 
   return (
-    <div className="container">
+    <div className="container p-5">
+      <div></div>
+      <h1 className="text-center mt-5">Admin Login Page</h1>
       <form onSubmit={handleSubmit}>
-        <div className="row">
+        <div className="row mt-5">
           <div className="col-md-6 offset-md-3 mt-2 p-4 border">
+            {message ? <h4 style={{ color: "red" }}>{message}</h4> : ""}
             <div className="mb-3">
               <label htmlFor="exampleInputEmail1" className="form-label">
                 Email address
               </label>
               <input
-                type="text"
+                type="email"
                 className="form-control"
                 id="exampleInputEmail1"
-                name="username"
+                name="email"
                 onChange={handleChange}
+                required
               />
             </div>
             <div className="mb-3">
@@ -50,6 +57,7 @@ const LoginPage = () => {
                 id="exampleInputPassword1"
                 name="password"
                 onChange={handleChange}
+                required
               />
             </div>
             <button type="submit" className="btn btn-primary">

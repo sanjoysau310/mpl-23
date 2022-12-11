@@ -1,45 +1,100 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import { NavLink } from "react-router-dom";
 
 export default function Navbar() {
+  const [navClass, setNavClass] = useState("navbar");
+  const toggleNav = () => {
+    navClass === "navbar"
+      ? setNavClass("navbar-mobile")
+      : setNavClass("navbar");
+  };
+
+  const closeNav = () => {
+    setNavClass("navbar");
+  };
+
   return (
-    <div>
-      <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
-        <div className="container-fluid">
-          <Link to="/" className="navbar-brand">
-            MSL
-          </Link>
-          <button
-            className="navbar-toggler"
-            type="button"
-            data-bs-toggle="collapse"
-            data-bs-target="#navbarNavAltMarkup"
-            aria-controls="navbarNavAltMarkup"
-            aria-expanded="false"
-            aria-label="Toggle navigation"
+    <nav id="navbar" className={navClass}>
+      <ul>
+        <li>
+          <NavLink
+            to="/"
+            className="nav-link scrollto text-decoration-none"
+            onClick={closeNav}
           >
-            <span className="navbar-toggler-icon" />
-          </button>
-          <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div className="navbar-nav">
-              {/* <Link
-                to="/"
-                className="nav-link active"
-                aria-current="page"
-                href="#"
-              >
-                Home
-              </Link> */}
-            </div>
-          </div>
-          {/* <Link to="adduser" className="btn btn-outline-light mr-5">
-            Add User
-          </Link> */}
-          <Link to="/login" className="btn btn-outline-light mr-5">
-            Admin Login
-          </Link>
-        </div>
-      </nav>
-    </div>
+            Home
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/about"
+            className="nav-link scrollto text-decoration-none"
+            onClick={closeNav}
+          >
+            About
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/events"
+            className="nav-link scrollto text-decoration-none"
+            onClick={closeNav}
+          >
+            Events
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/gallery"
+            className="nav-link scrollto text-decoration-none"
+            onClick={closeNav}
+          >
+            Gallery
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/playersview"
+            className="nav-link scrollto text-decoration-none"
+            onClick={closeNav}
+          >
+            Players
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/teams"
+            className="nav-link scrollto text-decoration-none"
+            onClick={closeNav}
+          >
+            Teams
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/contact"
+            className="nav-link scrollto text-decoration-none"
+            onClick={closeNav}
+          >
+            Contact
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to="/login"
+            className="nav-link scrollto text-decoration-none"
+            onClick={closeNav}
+          >
+            <i className="fa fa-right-to-bracket me-1" aria-hidden="true" />
+            Login
+          </NavLink>
+        </li>
+      </ul>
+      {navClass === "navbar" ? (
+        <i className="fa fa-bars mobile-nav-toggle" onClick={toggleNav} />
+      ) : (
+        <i className="fa fa-times mobile-nav-toggle" onClick={toggleNav} />
+      )}
+    </nav>
   );
 }

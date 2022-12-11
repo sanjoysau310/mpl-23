@@ -1,33 +1,38 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import { PlayerAge } from "../util/PlayerAge";
 
-export default function PlayerProfile() {
-  const [players, setPlayers] = useState([]);
+export const PlayerProfile = () => {
+  let { id } = useParams();
+  const [player, setPlayer] = useState({
+    pName: "",
+    pEmail: "",
+    pImage: "",
+    pDob: "",
+    pRole: "",
+    pBatting: "",
+    pBowling: "",
+    pKit: "",
+    pPayment: "",
+  });
 
   useEffect(() => {
-    loadPlayers();
+    loadPlayer();
   }, []);
 
-  const loadPlayers = async () => {
+  const loadPlayer = async () => {
     const result = await axios.get(`http://localhost:8080/player/${id}`);
     console.log(result.data);
-    setPlayers(result.data);
-  };
-
-  const calculateAge = (dob) => {
-    var birthday = new Date(dob);
-    var ageDifMs = Date.now() - birthday.getTime();
-    var ageDate = new Date(ageDifMs);
-    return Math.abs(ageDate.getUTCFullYear() - 1970);
+    setPlayer(result.data);
+    console.log(player);
   };
 
   return (
     <>
       <div className="bg-dark text-secondary text-center">
         <div className="py-5">
-          <h1 className="display-5 fw-bold text-white">
-            Musketeers Premier League 2023
-          </h1>
+          <h1 className="display-5 fw-bold text-white">Player Profile</h1>
         </div>
       </div>
       <div className="container">
@@ -51,38 +56,38 @@ export default function PlayerProfile() {
               </tr>
             </thead>
             <tbody>
-              {players.map((player) => (
-                <tr key={player.pId}>
-                  <th scope="row">{player.pId}</th>
-                  <td>{player.pName}</td>
-                  <td>{player.pEmail}</td>
-                  <td>{player.pEmail}</td>
-                  <td>{player.pEmail}</td>
-                  <td>{player.pRole}</td>
-                  <td>{player.pBatting}</td>
-                  <td>{player.pBowling}</td>
-                  <td>{player.pKit}</td>
-                  <td>{player.pPayment}</td>
-                  <td>{player.pDob}</td>
-                  <td>{calculateAge(player.pDob)}</td>
-                  <td>
-                    <img
-                      src={
-                        "https://drive.google.com/uc?export=view&id=" +
-                        player.pImage
-                      }
-                      width="100px"
-                      height="100px"
-                      alt={player.pName}
-                      className="img-fluid"
-                    />
-                  </td>
-                </tr>
-              ))}
+              <tr key={player.pId}>
+                <th scope="row">{player.pId}</th>
+                <td>{player.pName}</td>
+                <td>{player.pEmail}</td>
+                <td>{player.pEmail}</td>
+                <td>{player.pEmail}</td>
+                <td>{player.pRole}</td>
+                <td>{player.pBatting}</td>
+                <td>{player.pBowling}</td>
+                <td>{player.pKit}</td>
+                <td>{player.pPayment}</td>
+                <td>{player.pDob}</td>
+                <td>
+                  <PlayerAge dob={player.pDob} />
+                </td>
+                <td>
+                  <img
+                    src={
+                      "https://drive.google.com/uc?export=view&id=" +
+                      player.pImage
+                    }
+                    width="100px"
+                    height="100px"
+                    alt={player.pName}
+                    className="img-fluid"
+                  />
+                </td>
+              </tr>
             </tbody>
           </table>
         </div>
       </div>
     </>
   );
-}
+};
