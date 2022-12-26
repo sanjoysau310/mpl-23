@@ -23,7 +23,7 @@ import lombok.Setter;
 
 @SuppressWarnings("serial")
 @Component
-@Document(collection = "player_login_test")
+@Document(collection = "players_login_test")
 @Data
 @JsonIgnoreProperties
 @NoArgsConstructor
@@ -32,7 +32,7 @@ import lombok.Setter;
 public class Login implements UserDetails{
 	@Id
 	@Indexed(unique = true)
-	private String email;
+	private String username;
 	@Indexed(unique = true)
 	private String phone;
 	private String password;
@@ -40,18 +40,18 @@ public class Login implements UserDetails{
 
 	@Override
 	public String toString() {
-		return "LoginBean [email=" + email + ", phone=" + phone + ", password=" + password + ", role=" + role + "]";
+		return "LoginBean [username=" + username + ", phone=" + phone + ", password=" + password + ", role=" + role + "]";
 	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return new ArrayList<SimpleGrantedAuthority>(Arrays.asList(new SimpleGrantedAuthority(role)));
+		return new ArrayList<SimpleGrantedAuthority>(Arrays.asList(new SimpleGrantedAuthority("ROLE_"+role)));
 	}
 
 	@Override
 	public String getUsername() {
 		// TODO Auto-generated method stub
-		return email;
+		return username;
 	}
 
 	@Override

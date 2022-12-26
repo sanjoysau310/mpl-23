@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import AuctionSearch from "./AuctionSearch";
+import PrivateAPI from "../../../api/PrivateAPI";
 
 export default function AuctionList() {
   const [players, setPlayers] = useState([]);
@@ -10,17 +10,14 @@ export default function AuctionList() {
   }, []);
 
   const loadPlayers = async () => {
-    const result = await axios.get("http://localhost:8080/players");
+    const result = await PrivateAPI.get("/v1/player/playerslist");
     setPlayers(result.data);
   };
 
   return (
-    <div className="container">
+    <div className="container mt-5 py-5">
+      <h2 className="text-center mb-5">Auction List</h2>
       <div className="py-20">
-        <div className="d-flex float-end mt-5">
-          <AuctionSearch />
-        </div>
-
         <table className="table">
           <thead>
             <tr>

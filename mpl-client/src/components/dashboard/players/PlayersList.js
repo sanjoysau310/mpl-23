@@ -1,30 +1,72 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { PlayerAge } from "../../util/PlayerAge";
+import PrivateAPI from "../../../api/PrivateAPI";
+import { PlayerAge } from "../../../util/PlayerAge";
+import DeleteConfirmModal from "./DeleteConfirmModal";
 import SearchPlayer from "./SearchPlayer";
+
+const { REACT_APP_API_PLAYER_URL } = process.env;
 
 export default function PlayersList() {
   const [players, setPlayers] = useState([]);
+  const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
     loadPlayers();
   }, []);
 
   const loadPlayers = async () => {
-    const result = await axios.get("http://localhost:8080/players");
-    //console.log(result.data);
-    setPlayers(result.data);
+    await PrivateAPI.get(REACT_APP_API_PLAYER_URL + "/playerslist").then(
+      (result) => {
+        setPlayers(result.data);
+      }
+    );
+  };
+  const [msg, setMsg] = useState("");
+  //const[msgColor,setMsgColor]=
+  const deletePlayer = async (pId) => {
+    if (
+      window.confirm("Do you want to delete the player record!\nID- " + pId) ==
+      true
+    ) {
+      await PrivateAPI.delete(`/v1/player/deleteplayer/${pId}`)
+        .then((res) => {
+          setMsg(res.data);
+          window.location.reload(1);
+        })
+        .catch((err) => {
+          setMsg("Player deletion failed!");
+        });
+    } else {
+      setMsg("Delete action canceled!");
+    }
   };
 
   return (
     <div className="container">
       <div className="py-20">
-        <div className="d-flex float-end mt-5">
+        <div className="text-center mt-2">
+          <span
+            className={
+              msg.includes("deleted")
+                ? "bg-success"
+                : msg.includes("failed")
+                ? "bg-danger"
+                : msg.includes("canceled")
+                ? "bg-warning"
+                : ""
+            }
+          >
+            {msg} &emsp;
+            {msg && (
+              <i className="fa-solid fa-xmark" onClick={() => setMsg("")}></i>
+            )}
+          </span>
+        </div>
+        <div className="d-flex float-end mt-2">
           <SearchPlayer />
         </div>
-
-        <table className="table">
+        <table className="table table-striped">
           <thead>
             <tr>
               <th scope="col">ID</th>
@@ -40,6 +82,7 @@ export default function PlayersList() {
               <th scope="col">Age</th>
               <th scope="col">Payment Mode</th>
               <th scope="col">Payment Status</th>
+              <th scope="col">Action</th>
             </tr>
           </thead>
           <tbody>
@@ -63,7 +106,19 @@ export default function PlayersList() {
                   <PlayerAge dob={player.pDob} />
                 </td>
                 <td>{player.pPaymentMode}</td>
-                <td>{player.pPaymentStatus}</td>
+                <td>
+                  {player.pPaymentStatus === "Payment Successful"
+                    ? "Completed"
+                    : "Pending"}
+                </td>
+                <td>
+                  <span
+                    className="text-danger"
+                    onClick={() => deletePlayer(player.pId)}
+                  >
+                    <i className="fa-solid fa-trash"></i>
+                  </span>
+                </td>
               </tr>
             ))}
           </tbody>

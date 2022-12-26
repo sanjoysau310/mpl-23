@@ -1,10 +1,9 @@
-import axios from "axios";
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
+import PrivateAPI from "../../api/PrivateAPI";
 
 export default function Payment() {
   let { id } = useParams();
-  const { REACT_APP_API_URL, REACT_APP_PAYTM_URL } = process.env;
 
   useEffect(() => {
     makePayment();
@@ -47,23 +46,16 @@ export default function Payment() {
   };
 
   const getDetails = async (pId) => {
-    return await axios.get(`${REACT_APP_API_URL}/pgdetails/${pId}`);
+    return await PrivateAPI.get(`v1/payment/pgdetails/${pId}`);
   };
 
   const makePayment = async () => {
     getDetails(id).then((response) => {
       var information = {
-        action: REACT_APP_PAYTM_URL,
+        action: process.env.REACT_APP_PAYTM_URL,
         params: response.data,
       };
       post(information);
     });
   };
-  // return (
-  //   <div className="mt-5">
-  //     <button className="btn btn-primary mt-5" onClick={makePayment}>
-  //       PAY USING PAYTM
-  //     </button>
-  //   </div>
-  // );
 }

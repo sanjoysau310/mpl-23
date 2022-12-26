@@ -1,5 +1,11 @@
 package com.mpl.services.login;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +24,8 @@ import com.mpl.payloads.JWTAuthResponse;
 import com.mpl.repositories.LoginRepository;
 import com.mpl.services.security.CustomUserDetailsService;
 import com.mpl.utils.GeneratePassword;
+
+import io.jsonwebtoken.impl.DefaultClaims;
 
 @Service
 public class LoginServiceImpl implements LoginService {
@@ -38,12 +46,11 @@ public class LoginServiceImpl implements LoginService {
 	private PasswordEncoder passwordEncoder;
 	
 	@Override
-	public Login createLoginDetails(String email, String phone) {
+	public Login createLoginDetails(String username, String password, String phone) {
 		Login login=new Login();
-		login.setEmail(email);
+		login.setUsername(username);
 		login.setPhone(phone);
-		//login.setPassword(passwordEncoder.encode(GeneratePassword.generatePassword()));
-		login.setPassword(passwordEncoder.encode("test123"));
+		login.setPassword(passwordEncoder.encode(password));
 		login.setRole("PLAYER");
 		return loginRepository.save(login);
 	}
@@ -57,18 +64,30 @@ public class LoginServiceImpl implements LoginService {
 			System.out.println("Invalid details");
 			throw new ApiException("Invalid username or password");
 		}
-		
-		/// check casting
 		UserDetails userDetails=customUserDetailsService.loadUserByUsername(username);
-		//System.out.println("Authrnicate-----------"+userDetails);
-		
 		String token=jwtTokenHelper.generateToken(userDetails);
-		
-		System.out.println("Authrnicate token-----------"+token);
-		
 		JWTAuthResponse response=new JWTAuthResponse();
 		response.setToken(token);
-		
 		return new ResponseEntity<JWTAuthResponse>(response, null, HttpStatus.SC_OK);
+	}
+	
+	@Override
+	public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+		// From the HttpRequest get the claims
+		DefaultClaims claims = (DefaultClaims) request.getAttribute("claims");
+
+		Map<String, Object> expectedMap = getMapFromIoJsonwebtokenClaims(claims);
+		String token = jwtTokenHelper.doGenerateRefreshToken(expectedMap, (UserDetails)expectedMap.get("sub"));
+		JWTAuthResponse response=new JWTAuthResponse();
+		response.setToken(token);
+		return new ResponseEntity<JWTAuthResponse>(response, null, HttpStatus.SC_OK);
+	}
+
+	public Map<String, Object> getMapFromIoJsonwebtokenClaims(DefaultClaims claims) {
+		Map<String, Object> expectedMap = new HashMap<String, Object>();
+		for (Entry<String, Object> entry : claims.entrySet()) {
+			expectedMap.put(entry.getKey(), (UserDetails) entry.getValue());
+		}
+		return expectedMap;
 	}
 }

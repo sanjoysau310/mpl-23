@@ -12,21 +12,21 @@ import org.springframework.web.multipart.MultipartFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mpl.entities.Email;
-import com.mpl.entities.Login;
 import com.mpl.entities.Player;
+import com.mpl.entities.PlayerSequence;
 import com.mpl.entities.PlayersView;
+import com.mpl.entities.Team;
+import com.mpl.exceptions.PlayerNotFoundException;
 import com.mpl.payloads.PlayerDto;
-import com.mpl.repositories.LoginRepository;
 import com.mpl.repositories.PlayerRepository;
 import com.mpl.repositories.PlayersViewRepository;
 import com.mpl.services.email.EmailService;
 import com.mpl.services.login.LoginService;
+import com.mpl.services.team.TeamService;
 import com.mpl.services.drive.FileManagerService;
 import com.mpl.utils.CalculateAge;
+import com.mpl.utils.CalculateFees;
 import com.mpl.utils.EmailSetup;
-import com.mpl.utils.GeneratePassword;
-
-
 import static org.springframework.data.mongodb.core.FindAndModifyOptions.options;
 
 import java.util.List;
@@ -38,40 +38,40 @@ import javax.servlet.http.HttpServletRequest;
 public class PlayerServieImpl implements PlayerService {
 
 	@Autowired
+	private MongoOperations mongoOperations;
+	
+	@Autowired
 	private PlayerRepository playerRepository;
 	
 	@Autowired
-	private LoginService loginService;
-
-	@Autowired
 	private PlayersViewRepository playersViewRepository;
+	
+	
+	@Autowired
+	private LoginService loginService;
 
 	@Autowired
 	private FileManagerService fileManagerService;
 
 	@Autowired
 	private EmailService emailService;
-
+	
 	@Autowired
-	private Email emailBean;
-
-	@Autowired
-	private MongoOperations mongoOperations;
+	private TeamService teamService;
 	
 	@Autowired
 	private ObjectMapper objectMapper;
 
 	@Override
-	public Player addPlayer(HttpServletRequest request, String player, MultipartFile file) {
-		
+	public Player registerPlayer(HttpServletRequest request, String player, MultipartFile file) {
 		Player playerData = null;
 		try {
-			objectMapper.readValue(player, Player.class);
+			playerData=objectMapper.readValue(player, Player.class);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
-		playerData.setpFees(CalculateAge.getAge(playerData.getpDob()) >= 21 ? 300 : 150);
-
+		playerData.setpId(generateSequence(playerData.getSequenceName()));
+		playerData.setpFees(CalculateFees.getFees(playerData.getpDob(), playerData.getpKit()));
 		String fileName = StringUtils.cleanPath(file.getOriginalFilename());
 		String fileNameToUpload = playerData.getpName() + "_" + fileName;
 		String fileId = fileManagerService.uploadFile(file, fileNameToUpload);
@@ -79,19 +79,50 @@ public class PlayerServieImpl implements PlayerService {
 			return null;
 		}
 		playerData.setpImage(fileId);
+		//save login details
+		loginService.createLoginDetails(playerData.getpEmail(), playerData.getpPassword(), playerData.getpPhone());
+		
+		//remove pass words
+		playerData.setpPassword("");
+		playerData.setpConfirmPassword("");
+		//add player details
 		Player registeredPlayer = playerRepository.save(playerData);
 		
-		//save login details
-		Login loginBean=loginService.createLoginDetails(playerData.getpEmail(),playerData.getpPhone());
+		// send registration email
+		Email email=new Email();
+		email.setRecipient(registeredPlayer.getpEmail());
+		email.setSubject("Registration successfull | Payment Pending");
+		email.setMsgBody(EmailSetup.getEmailBodyForRegistration(request, registeredPlayer));
+		emailService.sendSimpleMail(email);
 		
-		// send registration email with cash pay
-		if (playerData.getpPaymentMode().equals("Cash")) {
-			emailBean.setRecipient(registeredPlayer.getpEmail());
-			emailBean.setSubject("Registration successfull | Payment Pending");
-			emailBean.setMsgBody(EmailSetup.getEmailBodyForRegistration(request, registeredPlayer, loginBean));
-			emailService.sendSimpleMail(emailBean);
-		}
 		return registeredPlayer;
+	}
+	
+	public Integer generateSequence(String seqName) {
+	    PlayerSequence counter = mongoOperations.findAndModify(new Query(Criteria.where("id").is(seqName)),
+	      new Update().inc("seq",1), options().returnNew(true).upsert(true),
+	      PlayerSequence.class);
+	    return !Objects.isNull(counter) ? counter.getSeq() : 1;
+	}
+	
+	public Player updatePlayerPaymentStatus(HttpServletRequest request, Integer pId, String paymentResult) {
+		Query query = new Query(Criteria.where("pId").is(pId));
+		@SuppressWarnings("static-access")
+		Update update = new Update().update("pPaymentStatus", paymentResult);
+		Player updatedPlayer = mongoOperations.findAndModify(query, update, options().returnNew(true).upsert(true),
+				Player.class);
+		
+		//fetch login details
+		//Login loginBean=mongoOperations.findOne(new Query(Criteria.where("email").is(updatedPlayer.getpEmail())), Login.class);
+		
+		// send online payment successful details email
+		Email email=new Email();
+		email.setRecipient(updatedPlayer.getpEmail());
+		email.setSubject("Registration Completed | " + updatedPlayer.getpPaymentStatus());
+		email.setMsgBody(EmailSetup.getEmailBodyForPayment(request, updatedPlayer));
+		emailService.sendSimpleMail(email);
+		
+		return updatedPlayer;
 	}
 
 	@Override
@@ -99,34 +130,20 @@ public class PlayerServieImpl implements PlayerService {
 		return playerRepository.findAll();
 	}
 
+	@Override
 	public List<PlayersView> getPlayersView() {
 		return playersViewRepository.findAll();
+	}
+	@Override
+	public Player getPlayerByEmail(String pEmail) {
+		return playerRepository.findByEmail(pEmail);
 	}
 
 	@Override
 	public Player getPlayerById(Integer pId) {
+		if(!mongoOperations.exists(new Query(Criteria.where("pId").is(pId)), Player.class))
+			throw new PlayerNotFoundException(pId);
 		return playerRepository.getPlayerById(pId);
-	}
-
-	public void updatePlayerPaymentStatus(HttpServletRequest request, Integer pId, String paymentResult) {
-		Query query = new Query(Criteria.where("pId").is(pId));
-		@SuppressWarnings("static-access")
-		Update update = new Update().update("pPaymentStatus", paymentResult);
-		Player updatedPlayer = mongoOperations.findAndModify(query, update, options().returnNew(true).upsert(true),
-				Player.class);
-		
-		
-		//fetch login details
-		
-		//LoginBean loginBean=loginRepository.getLoginDetailsByEmail(updatedPlayer.getpEmail());
-		//LoginBean loginBean=mongoOperations.findById(updatedPlayer.getpEmail(), LoginBean.class);
-		Login loginBean=mongoOperations.findOne(new Query(Criteria.where("email").is(updatedPlayer.getpEmail())), Login.class);
-		
-		// send online payment details email
-		emailBean.setRecipient(updatedPlayer.getpEmail());
-		emailBean.setSubject("Registration successfull | " + updatedPlayer.getpPaymentSatus());
-		emailBean.setMsgBody(EmailSetup.getEmailBodyForRegistration(request, updatedPlayer,loginBean));
-		emailService.sendSimpleMail(emailBean);
 	}
 
 	@Override
@@ -139,6 +156,67 @@ public class PlayerServieImpl implements PlayerService {
 	public boolean checkPhoneExists(String pPhone) {
 		return mongoOperations.query(Player.class).matching(new Query(Criteria.where("pPhone").is(pPhone)))
 				.exists();
+	}
+	
+	@Override
+	public Player editPlayerData(HttpServletRequest request,String playerData) {
+		Player player = null;
+		try {
+			player=objectMapper.readValue(playerData, Player.class);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		Query query = new Query(Criteria.where("pId").is(player.getpId()));
+		Update update = new Update();
+		update.set("pKit", player.getpKit());
+		update.set("pBasePrice", player.getpBasePrice());
+		update.set("pTeam", player.getpTeam());
+		update.set("pPaymentMode", player.getpPaymentMode());
+		update.set("pPaymentStatus", player.getpPaymentStatus());
+		Player editedPlayer = mongoOperations.findAndModify(query, update, options().returnNew(true).upsert(true),
+				Player.class);
+		
+		// send payment successful details email
+		if(editedPlayer.getpPaymentStatus().equals("Payment Successful")) {
+			Email email=new Email();
+			email.setRecipient(editedPlayer.getpEmail());
+			email.setSubject("Registration Completed | " + editedPlayer.getpPaymentStatus());
+			email.setMsgBody(EmailSetup.getEmailBodyForPayment(request, editedPlayer));
+			emailService.sendSimpleMail(email);	
+		}
+				
+		
+		return editedPlayer;
+	}
+
+	@Override
+	public Player updatePlayerData(String playerData) {
+		Player player = null;
+		try {
+			player=objectMapper.readValue(playerData, Player.class);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		Query query = new Query(Criteria.where("pId").is(player.getpId()));
+		Update update = new Update();
+		update.set("pTeam", player.getpTeam());
+		update.set("pSoldPrice", player.getpSoldPrice());
+		update.set("pStatus", player.getpStatus());
+		Player updatedPlayer = mongoOperations.findAndModify(query, update, options().returnNew(true).upsert(true),
+				Player.class);
+		
+		//update to teams table
+		//teamService.updatePlayerTeam(player);
+		
+		return updatedPlayer;
+	}
+	
+	@Override
+	public String deleteById(Integer pId) {
+		if(!mongoOperations.exists(new Query(Criteria.where("pId").is(pId)), Player.class))
+			throw new PlayerNotFoundException(pId);
+		playerRepository.deleteBypId(pId);
+		return "Player with id " +pId+" deleted successfully";
 	}
 	
 	private Player playertDtoToPlayer(PlayerDto playerDto) {
@@ -188,4 +266,5 @@ public class PlayerServieImpl implements PlayerService {
 //		playerDto.setPPaymentStatus(player.getpPaymentSatus());
 		return objectMapper.convertValue(player, PlayerDto.class);
 	}
+
 }

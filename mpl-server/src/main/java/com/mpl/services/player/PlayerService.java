@@ -13,11 +13,16 @@ import com.mpl.entities.PlayersView;
 
 @Service
 public interface PlayerService {
-	Player addPlayer(HttpServletRequest request, String player, MultipartFile file);
+	Player registerPlayer(HttpServletRequest request, String player, MultipartFile file);
 	List<Player> getAllPlayers();
 	List<PlayersView> getPlayersView();
+	Player getPlayerByEmail(String pEmail);
 	Player getPlayerById(Integer pId);
-	void updatePlayerPaymentStatus(HttpServletRequest request,Integer pId, String paymentResult);
+	Player updatePlayerPaymentStatus(HttpServletRequest request,Integer pId, String paymentResult);
 	boolean checkEmailExists(String pEmail);
 	boolean checkPhoneExists(String pPhone);
+	Player editPlayerData(HttpServletRequest request, String playerData);
+	Player updatePlayerData(String playerData);
+	String deleteById(Integer pId);
+	
 }

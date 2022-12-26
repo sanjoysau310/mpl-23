@@ -1,7 +1,7 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { PlayerAge } from "../../util/PlayerAge";
+import { PlayerAge } from "../../../util/PlayerAge";
+import PrivateAPI from "../../../api/PrivateAPI";
 
 export default function PlayerProfile() {
   let { id } = useParams();
@@ -10,53 +10,85 @@ export default function PlayerProfile() {
   const [playerData, setPlayerData] = useState({
     pId: "",
     pKit: "",
-    pBaseprice: "",
+    pBasePrice: "",
     pTeam: "",
     pPaymentMode: "",
     pPaymentStatus: "",
   });
 
+  const kitDetails = [
+    "",
+    "M | Half Sleeve",
+    "L | Half Sleeve",
+    "XL | Half Sleeve",
+    "XXL | Half Sleeve",
+    "M | Full Sleeve",
+    "L | Full Sleeve",
+    "XL | Full Sleeve",
+    "XXL | Full Sleeve",
+  ];
+  const teamNames = [
+    "",
+    "Cowboys",
+    "Demons",
+    "Falcons",
+    "Hustlers",
+    "Martians",
+    "Pirates",
+    "Scorpions",
+    "Skyhawks",
+    "Trojans",
+    "Vikings",
+  ];
+
   useEffect(() => {
     loadPlayer();
   }, []);
 
+  useEffect(() => {
+    setPlayerData({
+      pId: player.pId,
+      pKit: player.pKit ? player.pKit : "",
+      pBasePrice: player.pBasePrice ? player.pBasePrice : "",
+      pTeam: player.pTeam ? player.pTeam : "",
+      pPaymentMode: player.pPaymentMode ? player.pPaymentMode : "",
+      pPaymentStatus: player.pPaymentStatus ? player.pPaymentStatus : "",
+    });
+  }, [player]);
+
   const loadPlayer = async () => {
-    const result = await axios.get(`http://localhost:8080/player/${id}`);
-    //console.log(result.data);
-    setPlayer(result.data);
+    await PrivateAPI.get(`/v1/player/playerid/${id}`).then((result) => {
+      setPlayer(result.data);
+    });
   };
 
   const handleChange = (e) => {
     setPlayerData({ ...playerData, [e.target.name]: e.target.value });
-    //console.log(playerData);
   };
-  const saveEditProfile = () => {
-    //setPlayerData({ ...playerData, pId:id });
-    console.log(id);
-    setPlayerData((prev) => ({ ...prev, pId: id }));
-    console.log(playerData);
+  const saveEditProfile = async () => {
+    const result = await PrivateAPI.put("/v1/player/editplayer", playerData);
     setFlag(false);
   };
   return (
     <div>
-      {/* {console.log(playerData)} */}
-      <div className="mt-5 p-1">
-        <Link to="/players" className="text-decoration-none text-dark">
-          <i className="fa fa-arrow-left fa-3x" aria-hidden="true"></i>
-        </Link>
-        {/* <h1 className="text-center">MPL 2023 Player Profile </h1> */}
-      </div>
-      <div className="container">
-        <h2 className="text-center">MPL 2023 Player Profile </h2>
+      <div className="container mt-5 p-5">
         <div className="row gutters-sm mt-3">
           <div className="col-md-4 mb-3">
+            <Link
+              to="/playerspage"
+              className="text-decoration-none text-dark text-start"
+            >
+              <i className="fa fa-arrow-left fa-3x" aria-hidden="true"></i>
+            </Link>
             <div className="card">
               <div className="card-body">
                 <div className="d-flex flex-column align-items-center text-center">
                   <img
                     src={
-                      "https://drive.google.com/uc?export=view&id=" +
-                      player.pImage
+                      player.pImage !== undefined
+                        ? "https://drive.google.com/uc?export=view&id=" +
+                          player.pImage
+                        : ""
                     }
                     alt={player.pName}
                     className="img-thumbnail"
@@ -64,9 +96,7 @@ export default function PlayerProfile() {
                 </div>
               </div>
             </div>
-          </div>
-          <div className="col-md-4">
-            <div className="card mb-3">
+            <div className="card mt-2">
               <div className="card-body">
                 <div className="row">
                   <div className="col-sm-5">
@@ -80,6 +110,13 @@ export default function PlayerProfile() {
                   </div>
                   <div className="col-sm-7 text-secondary">{player.pName}</div>
                 </div>
+              </div>
+            </div>
+          </div>
+          <div className="col-md-5">
+            <h2 className="text-center">MPL 2023 Player Profile </h2>
+            <div className="card mb-3">
+              <div className="card-body">
                 <div className="row">
                   <div className="col-sm-5">
                     <h6 className="mb-3">Email</h6>
@@ -118,9 +155,7 @@ export default function PlayerProfile() {
                   <div className="col-sm-5">
                     <h6 className="mb-3">Kit Details</h6>
                   </div>
-                  <div className="col-sm-7 text-secondary">
-                    Half Sleve | {player.pKit}
-                  </div>
+                  <div className="col-sm-7 text-secondary">{player.pKit}</div>
                 </div>
                 <div className="row">
                   <div className="col-sm-5">
@@ -144,22 +179,70 @@ export default function PlayerProfile() {
                     {player.pBowling}
                   </div>
                 </div>
-                <div className="row">
+                {/* <div className="row">
                   <div className="col-sm-5">
                     <h6 className="mb-3">Base Price</h6>
                   </div>
                   <div className="col-sm-7 text-secondary">
-                    {player.pBaseprice}
+                    {player.pBasePrice}
                   </div>
                 </div>
-
+                <div className="row">
+                  <div className="col-sm-5">
+                    <h6 className="mb-3">Sold Price</h6>
+                  </div>
+                  <div className="col-sm-7 text-secondary">
+                    {player.pSoldPrice}
+                  </div>
+                </div>
                 <div className="row">
                   <div className="col-sm-5">
                     <h6 className="mb-3">Team</h6>
                   </div>
                   <div className="col-sm-7 text-secondary">{player.pTeam}</div>
+                </div> */}
+                {player.pBasePrice ? (
+                  <div className="row">
+                    <div className="col-sm-5">
+                      <h6 className="mb-3">Base Price</h6>
+                    </div>
+                    <div className="col-sm-7 text-secondary">
+                      {player.pBasePrice}
+                    </div>
+                  </div>
+                ) : (
+                  ""
+                )}
+                {player.pSoldPrice ? (
+                  <div className="row">
+                    <div className="col-sm-5">
+                      <h6 className="mb-3">Sold Price</h6>
+                    </div>
+                    <div className="col-sm-7 text-secondary">
+                      {player.pSoldPrice}
+                    </div>
+                  </div>
+                ) : (
+                  ""
+                )}
+                {player.pTeam ? (
+                  <div className="row">
+                    <div className="col-sm-5">
+                      <h6 className="mb-3">Team</h6>
+                    </div>
+                    <div className="col-sm-7 text-secondary">
+                      {player.pTeam}
+                    </div>
+                  </div>
+                ) : (
+                  ""
+                )}
+                <div className="row">
+                  <div className="col-sm-5">
+                    <h6 className="mb-3">Payment Fees</h6>
+                  </div>
+                  <div className="col-sm-7 text-secondary">{player.pFees}</div>
                 </div>
-
                 <div className="row">
                   <div className="col-sm-5">
                     <h6 className="mb-3">Payment Mode</h6>
@@ -174,7 +257,9 @@ export default function PlayerProfile() {
                     <h6 className="mb-0">Payment Status</h6>
                   </div>
                   <div className="col-sm-7 text-secondary">
-                    {player.pPaymentStatus ? "Done" : "Not Done"}
+                    {player.pPaymentStatus === "Payment Successful"
+                      ? "Completed"
+                      : "Pending"}
                   </div>
                 </div>
 
@@ -194,7 +279,7 @@ export default function PlayerProfile() {
             </div>
           </div>
           {flag ? (
-            <div className="col-sm-4 mb-3">
+            <div className="col-sm-3 mb-3">
               <div className="card">
                 <div className="card-body">
                   <form className="row g-3" onSubmit={saveEditProfile}>
@@ -218,16 +303,16 @@ export default function PlayerProfile() {
                       </label>
                       <select
                         name="pKit"
-                        // value={player.pKit ? player.pKit : ""}
                         className="form-control"
                         id="pkitsize"
+                        value={playerData?.pKit}
                         onChange={handleChange}
                       >
-                        <option value="">Select Kit Size</option>
-                        <option value="M">M</option>
-                        <option value="L">L</option>
-                        <option value="XL">XL</option>
-                        <option value="XXL">XXL</option>
+                        {kitDetails.map((kit) => (
+                          <option key={kit} name={kit} value={kit}>
+                            {kit.length > 0 ? kit : "Select Kit Details"}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     <div className="">
@@ -238,8 +323,8 @@ export default function PlayerProfile() {
                         type="number"
                         className="form-control"
                         id="playerBasePrice"
-                        name="pBaseprice"
-                        // value={player.pBaseprice ? player.pBaseprice : 0}
+                        name="pBasePrice"
+                        value={playerData?.pBasePrice}
                         onChange={handleChange}
                         placeholder="Base Price"
                       />
@@ -250,22 +335,20 @@ export default function PlayerProfile() {
                       </label>
                       <select
                         name="pTeam"
-                        //value={player.pTeam ? player.pTeam : ""}
+                        value={playerData?.pTeam}
                         className="form-control"
                         id="teamName"
                         onChange={handleChange}
                       >
-                        <option value="">Select Team</option>
-                        <option value="1">team 1</option>
-                        <option value="2">team 2</option>
-                        <option value="3">team 3</option>
-                        <option value="4">team 4</option>
-                        <option value="5">team 5</option>
-                        <option value="6">team 6</option>
-                        <option value="7">Team 7</option>
-                        <option value="8">team 8</option>
-                        <option value="9">team 9</option>
-                        <option value="10">team 10</option>
+                        {teamNames.map((teamName) => (
+                          <option
+                            key={teamName}
+                            name={teamName}
+                            value={teamName}
+                          >
+                            {teamName.length > 0 ? teamName : "Select Team"}
+                          </option>
+                        ))}
                       </select>
                     </div>
 
@@ -275,7 +358,7 @@ export default function PlayerProfile() {
                       </label>
                       <select
                         name="pPaymentMode"
-                        //value={player.pPaymentMode ? player.pPaymentMode : ""}
+                        value={playerData?.pPaymentMode}
                         className="form-control"
                         id="paymentM"
                         onChange={handleChange}
@@ -291,14 +374,14 @@ export default function PlayerProfile() {
                       </label>
                       <select
                         name="pPaymentStatus"
-                        value={player.pPaymentStatus}
+                        value={playerData.pPaymentStatus}
                         className="form-control"
                         id="paymentS"
                         onChange={handleChange}
                       >
                         <option value="">Select Payment Status</option>
-                        <option value="Done">Done</option>
-                        <option value="Not Done">Not Done</option>
+                        <option value="Payment Successful">Completed</option>
+                        <option value="Payment Unsuccessful">Pending</option>
                       </select>
                     </div>
                     <div className="text-end mt-5">

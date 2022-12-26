@@ -19,6 +19,7 @@ export const LandingPage = () => {
           >
             <h1>Musketeers Premier League 2023</h1>
             <h1>Season 8</h1>
+
             <h2>No one is born star. We make them stars.</h2>
             <div className="d-flex justify-content-center justify-content-lg-start">
               <div>
@@ -38,6 +39,7 @@ export const LandingPage = () => {
                 </Link>
               </div>
             </div>
+            <h2 className="mt-5 p-5">Event Dates- 21 and 22 January 2023</h2>
             {/* <div className="logo d-flex justify-content-center p-5">
               <img src={rclLogo} alt="RCL" />
             </div> */}

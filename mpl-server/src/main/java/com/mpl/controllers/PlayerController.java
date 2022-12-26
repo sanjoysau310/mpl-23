@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,10 +32,9 @@ public class PlayerController {
 	@Autowired
 	private PlayerService playerService;
 
-	@PostMapping(path = "/addplayer", consumes = { MediaType.APPLICATION_JSON_VALUE,MediaType.MULTIPART_FORM_DATA_VALUE })
+	@PostMapping(path = "/register", consumes = { MediaType.APPLICATION_JSON_VALUE,MediaType.MULTIPART_FORM_DATA_VALUE })
 	public Player registerPlayer( HttpServletRequest request,@RequestParam("player") String player, @RequestParam("pImage") MultipartFile file) {
-		
-		return playerService.addPlayer(request, player,file);	
+		return playerService.registerPlayer(request, player,file);	
 	}
 	
 	@GetMapping("/checkemail/{pEmail}")
@@ -44,11 +44,10 @@ public class PlayerController {
 	
 	@GetMapping("/checkphone/{pPhone}")
 	public boolean checkPhoneExists(@PathVariable String pPhone) {
-		System.out.println("Phone----------"+pPhone);
 		return playerService.checkPhoneExists(pPhone);
 	}
 
-	@GetMapping("/players")
+	@GetMapping("/playerslist")
 	List<Player> getAllPlayers() {
 		return playerService.getAllPlayers();
 	}
@@ -57,18 +56,33 @@ public class PlayerController {
 	List<PlayersView> getPlayersView() {
 		return playerService.getPlayersView();
 	}
+	
+	@GetMapping("/playerview/{pEmail}")
+	Player getPlayerView(@PathVariable String pEmail) {
+		return playerService.getPlayerByEmail(pEmail);
+	}
 
-	@GetMapping("/player/{pId}")
+	@GetMapping("/playerid/{pId}")
 	Player getPlayer(@PathVariable Integer pId) {
-		
 		return playerService.getPlayerById(pId);
 	}
 	
-	@PreAuthorize("hasrole('ADMIN')")
-	@PutMapping("/player/{id}")
-	void updateUser(@PathVariable int id, @RequestBody String playerData) {
-		System.out.println(playerData);
-		//playerRepository.updatePlayerData(id,playerData);
+	@PutMapping("/editplayer")
+	Player editPlayer(HttpServletRequest request,@RequestBody String playerData) {
+		return playerService.editPlayerData(request,playerData);
+	}
+	
+	//@PreAuthorize("hasrole('ADMIN')")
+	@PutMapping("/updateplayer")
+	Player updatePlayer(@RequestBody String playerData) {
+		System.out.println("update data::::::::::---------------"+playerData);
+		return playerService.updatePlayerData(playerData);
+		
+	}
+	
+	@DeleteMapping("/deleteplayer/{pId}")
+	String deleteUser(@PathVariable Integer pId) {
+		return playerService.deleteById(pId);
 	}
 	
 //	@PutMapping("/player/{id}")

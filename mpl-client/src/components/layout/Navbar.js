@@ -1,8 +1,35 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import { useStoreContext } from "../../context/StoreContext";
+import { isAdmin, isPlayer, getUser } from "../../util/tokenUtils";
 
 export default function Navbar() {
+  const { store, setStore } = useStoreContext();
+  const [username, setUsername] = useState("");
+  const [adminAccess, setAdminAccess] = useState(false);
+  const [playerAccess, setPlayerAccess] = useState(false);
+
   const [navClass, setNavClass] = useState("navbar");
+
+  useEffect(() => {
+    if (store && store.token) {
+      setAdminAccess(isAdmin(store.token));
+      setPlayerAccess(isPlayer(store.token));
+      setUsername(getUser(store.token));
+    } else {
+      let token = sessionStorage.getItem("token");
+      if (token) {
+        setStore(token);
+        setAdminAccess(isAdmin(token));
+        setPlayerAccess(isPlayer(token));
+        setUsername(getUser(token));
+      } else {
+        setAdminAccess(false);
+        setPlayerAccess(false);
+        setUsername("");
+      }
+    }
+  }, [store]);
   const toggleNav = () => {
     navClass === "navbar"
       ? setNavClass("navbar-mobile")
@@ -15,10 +42,17 @@ export default function Navbar() {
 
   return (
     <nav id="navbar" className={navClass}>
+      {/* {console.log(store)} */}
       <ul>
         <li>
           <NavLink
-            to="/"
+            to={
+              adminAccess
+                ? "/home"
+                : playerAccess
+                ? `/playerview/${username}`
+                : "/"
+            }
             className="nav-link scrollto text-decoration-none"
             onClick={closeNav}
           >
@@ -27,11 +61,29 @@ export default function Navbar() {
         </li>
         <li>
           <NavLink
-            to="/about"
+            to={adminAccess ? "/auctionpage" : "/about"}
             className="nav-link scrollto text-decoration-none"
             onClick={closeNav}
           >
-            About
+            {adminAccess ? "Auction" : "About"}
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to={adminAccess ? "/playerspage" : "/playersview"}
+            className="nav-link scrollto text-decoration-none"
+            onClick={closeNav}
+          >
+            Players
+          </NavLink>
+        </li>
+        <li>
+          <NavLink
+            to={adminAccess ? "/teamspage" : "/teams"}
+            className="nav-link scrollto text-decoration-none"
+            onClick={closeNav}
+          >
+            Teams
           </NavLink>
         </li>
         <li>
@@ -54,24 +106,6 @@ export default function Navbar() {
         </li>
         <li>
           <NavLink
-            to="/playersview"
-            className="nav-link scrollto text-decoration-none"
-            onClick={closeNav}
-          >
-            Players
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
-            to="/teams"
-            className="nav-link scrollto text-decoration-none"
-            onClick={closeNav}
-          >
-            Teams
-          </NavLink>
-        </li>
-        <li>
-          <NavLink
             to="/contact"
             className="nav-link scrollto text-decoration-none"
             onClick={closeNav}
@@ -79,16 +113,44 @@ export default function Navbar() {
             Contact
           </NavLink>
         </li>
-        <li>
+        {/* <li>
           <NavLink
-            to="/login"
+            to="/signup"
             className="nav-link scrollto text-decoration-none"
             onClick={closeNav}
           >
-            <i className="fa fa-right-to-bracket me-1" aria-hidden="true" />
-            Login
+            Signup
           </NavLink>
+        </li> */}
+        <li>
+          {!store && (
+            <NavLink
+              to="/login"
+              className="nav-link scrollto text-decoration-none"
+              onClick={closeNav}
+            >
+              Login
+              <i className="fa fa-right-to-bracket ms-2" aria-hidden="true" />
+            </NavLink>
+          )}
         </li>
+        <li>
+          {store && (
+            <NavLink
+              to="/login"
+              className="nav-link scrollto text-decoration-none"
+              onClick={() => {
+                closeNav();
+                sessionStorage.removeItem("token");
+                setStore("");
+              }}
+            >
+              {username}
+              <i className="fa fa-right-to-bracket ms-2" aria-hidden="true" />
+            </NavLink>
+          )}
+        </li>
+        {/* {console.log(localStorage)} */}
       </ul>
       {navClass === "navbar" ? (
         <i className="fa fa-bars mobile-nav-toggle" onClick={toggleNav} />

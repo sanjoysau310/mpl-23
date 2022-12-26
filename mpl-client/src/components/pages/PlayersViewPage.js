@@ -1,15 +1,14 @@
-import axios from "axios";
 import React, { useEffect, useState } from "react";
+import PublicAPI from "../../api/PublicAPI";
 
 export default function PlayersViewPage() {
   const [players, setPlayers] = useState([]);
-
   useEffect(() => {
     loadPlayers();
   }, []);
 
   const loadPlayers = async () => {
-    const result = await axios.get("http://localhost:8080/playersview");
+    const result = await PublicAPI.get("/v1/player/playersview");
     //console.log(result.data);
     setPlayers(result.data);
   };
@@ -24,7 +23,7 @@ export default function PlayersViewPage() {
               <th scope="col">ID</th>
               <th scope="col">Name</th>
               <th scope="col">Payment Mode</th>
-              <th scope="col">Status</th>
+              <th scope="col">Payment Status</th>
             </tr>
           </thead>
           <tbody>

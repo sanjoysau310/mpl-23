@@ -19,7 +19,7 @@ public class CustomUserDetailsService implements UserDetailsService{
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		Login loginDetails=loginRepository.findByEmail(username).orElseThrow(()->new PlayerNotFoundException(username));
+		Login loginDetails=loginRepository.findByUsername(username).orElseThrow(()->new PlayerNotFoundException(username));
 		return loginDetails;
 	}
 

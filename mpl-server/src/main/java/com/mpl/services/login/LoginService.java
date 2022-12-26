@@ -1,5 +1,7 @@
 package com.mpl.services.login;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -11,5 +13,7 @@ public interface LoginService {
 
 	ResponseEntity<JWTAuthResponse> authenticatePlayer(String username, String password);
 
-	Login createLoginDetails(String email, String phone);
+	Login createLoginDetails(String email, String password, String phone);
+
+	ResponseEntity<?> refreshToken(HttpServletRequest request);
 }

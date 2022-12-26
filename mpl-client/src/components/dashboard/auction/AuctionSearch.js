@@ -1,17 +1,31 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import PrivateAPI from "../../../api/PrivateAPI";
 
 export default function AuctionSearch() {
   let navigate = useNavigate();
   const [pId, setPId] = useState("");
+  const [msg, setMsg] = useState("");
 
   const searchPlayerById = async (e) => {
     e.preventDefault();
     navigate(`/playerauction/${pId}`);
+    await PrivateAPI.get(`/v1/player/payerid/${pId}`)
+      .then((res) => {
+        navigate(`/playerauction/${pId}`);
+      })
+      .catch((err) => {
+        console.log(err);
+        setMsg("Player not found with ID- " + pId);
+      });
   };
   return (
-    <div className="justify-content-center mt-5">
-      <div className="">
+    <div className="container mt-5 p-5">
+      <h2 className="text-center">Player Under Hammer </h2>
+      <h2 className="text-center p-5">
+        <i className="fa fa-gavel f-left fa-5x" />
+      </h2>
+      <div className="d-flex justify-content-center">
         <form className="row g-3" onSubmit={searchPlayerById}>
           <div className="col-auto">
             <input
@@ -30,6 +44,9 @@ export default function AuctionSearch() {
             </button>
           </div>
         </form>
+      </div>
+      <div className="text-center mt-5">
+        <i className="text-danger">{msg}</i>
       </div>
     </div>
   );

@@ -1,13 +1,32 @@
-import axios from "axios";
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import PublicAPI from "../../api/PublicAPI";
 import Spinner from "../layout/Spinner";
+import Upload from "../../util/Upload";
 
 const RegistrationPage = () => {
   let navigate = useNavigate();
+
   const [player, setPlayer] = useState({
     pName: "",
     pEmail: "",
+    pPassword: "",
+    pConfirmPassword: "",
+    pPhone: "",
+    pWhatsapp: "",
+    pDob: "",
+    pRole: "",
+    pBatting: "",
+    pBowling: "",
+    pKit: "",
+    pPaymentMode: "",
+  });
+
+  const [error, setError] = useState({
+    pName: "",
+    pEmail: "",
+    pPassword: "",
+    pConfirmPassword: "",
     pPhone: "",
     pWhatsapp: "",
     pDob: "",
@@ -18,47 +37,83 @@ const RegistrationPage = () => {
     pPaymentMode: "",
   });
   const [pImage, setpImage] = useState("");
+  const [passwordType, setPasswordType] = useState("password");
   const [contactCheck, setContactCheck] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const [errorMessage, setErrorMessage] = useState("");
 
-  const { REACT_APP_API_URL } = process.env;
-
   const handleChange = async (e) => {
-    e.target.name === "pImage"
-      ? setpImage(e.target.files[0])
-      : setPlayer({ ...player, [e.target.name]: e.target.value });
+    const re = /^[0-9\b]+$/;
+    if (e.target.name === "pPhone" || e.target.name === "pWhatsapp") {
+      if (e.target.value === "" || re.test(e.target.value)) {
+        setPlayer({ ...player, [e.target.name]: e.target.value });
+      }
+    } else {
+      setPlayer({ ...player, [e.target.name]: e.target.value });
+    }
+  };
+
+  const togglePassword = () => {
+    if (passwordType === "password") {
+      setPasswordType("text");
+      return;
+    }
+    setPasswordType("password");
+  };
+
+  const handleValidation = (e) => {
+    let { name, value } = e.target;
+    setError((prev) => {
+      const stateObj = { ...prev, [name]: "" };
+      switch (name) {
+        case "pPassword":
+          if (!value) {
+            stateObj[name] = "Please enter Password.";
+          } else if (
+            player.pConfirmPassword &&
+            value !== player.pConfirmPassword
+          ) {
+            stateObj["confirmPassword"] =
+              "Password and Confirm Password does not match.";
+          } else {
+            stateObj["confirmPassword"] = player.pConfirmPassword
+              ? ""
+              : error.pConfirmPassword;
+          }
+          break;
+        case "pConfirmPassword":
+          if (!value) {
+            stateObj[name] = "Please enter Confirm Password.";
+          } else if (player.pPassword && value !== player.pPassword) {
+            stateObj[name] = "Password and Confirm Password does not match.";
+          }
+          break;
+        default:
+          break;
+      }
+      return stateObj;
+    });
   };
 
   const checkBoxClick = () => {
     setContactCheck(!contactCheck);
-    // !contactCheck
-    //   ? setPlayer({ ...player, pWhatsapp: player.pPhone })
-    //   : setPlayer({ ...player, pWhatsapp: player.pWhatsapp });
+    !contactCheck
+      ? setPlayer({ ...player, pWhatsapp: player.pPhone })
+      : setPlayer({ ...player, pWhatsapp: "" });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    //console.log("player-", player);
     const playerData = new FormData();
     playerData.append("player", JSON.stringify(player));
     playerData.append("pImage", pImage);
-    const checkEmail = await axios.get(
-      `${REACT_APP_API_URL}/checkemail/${player.pEmail}`
-    );
-    const checkPhone = await axios.get(
-      `${REACT_APP_API_URL}/checkphone/${player.pPhone}`
-    );
 
-    // checkEmail.data
-    //   ? setEmailMessage("This Email has been already registered")
-    //   : setEmailMessage("");
-    // checkPhone.data
-    //   ? setPhoneMessage("This Phone number has been already registered")
-    //   : setPhoneMessage("");
-
+    const checkEmail = await PublicAPI.get(
+      `/v1/player/checkemail/${player.pEmail}`
+    );
+    const checkPhone = await PublicAPI.get(
+      `/v1/player/checkphone/${player.pPhone}`
+    );
     if (checkEmail.data && checkPhone.data) {
       setErrorMessage(
         "This Email and Phone number have been registered already"
@@ -69,14 +124,12 @@ const RegistrationPage = () => {
       setErrorMessage("This Phone number has been registered already");
     } else if (!checkEmail.data && !checkPhone.data) {
       setLoading(true);
-      const result = await axios.post(
-        `${REACT_APP_API_URL}/addplayer`,
-        playerData
-      );
+      const result = await PublicAPI.post("/v1/player/register", playerData);
       result.data ? setLoading(false) : setLoading(true);
-      player.pPaymentMode === "Online"
-        ? await navigate(`/pay/${result.data.pId}`)
-        : navigate("/successpage");
+      // player.pPaymentMode === "Online"
+      //   ? await navigate(`/pay/${result.data.pId}`)
+      //   : navigate("/successpage");
+      result.data ? navigate("/successpage") : navigate("/errorpage");
     }
   };
 
@@ -101,6 +154,7 @@ const RegistrationPage = () => {
                   onChange={handleChange}
                   required
                 />
+                <i style={{ color: "red" }}>{error.pName}</i>
               </div>
               <div className="mb-2">
                 <label htmlFor="username" className="form-label">
@@ -116,14 +170,63 @@ const RegistrationPage = () => {
                 />
               </div>
               <div className="mb-2">
+                <label htmlFor="pass" className="form-label">
+                  Password
+                </label>
+
+                <div className="input-group">
+                  <input
+                    type={passwordType}
+                    onChange={handleChange}
+                    value={player.pPassword}
+                    id="pass"
+                    name="pPassword"
+                    className="form-control"
+                    placeholder="Password"
+                    required
+                  />
+                  <div className="input-group-btn">
+                    <span
+                      className="btn btn-outline-secondary form-control"
+                      onClick={togglePassword}
+                    >
+                      {passwordType === "password" ? (
+                        <i className="fa-solid fa-eye" />
+                      ) : (
+                        <i className="fa-solid fa-eye-slash" />
+                      )}
+                    </span>
+                  </div>
+                </div>
+                <i style={{ color: "red" }}>{error.pPassword}</i>
+              </div>
+              <div className="mb-2">
+                <label htmlFor="cpass" className="form-label">
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  className="form-control"
+                  id="cpass"
+                  name="pConfirmPassword"
+                  onChange={handleChange}
+                  onBlur={handleValidation}
+                  required
+                />
+                <i style={{ color: "red" }}>{error.pConfirmPassword}</i>
+              </div>
+              <div className="mb-2">
                 <label htmlFor="phonenumber" className="form-label">
                   Primary Contact
                 </label>
                 <input
-                  type="number"
+                  type="text"
                   className="form-control"
                   id="phonenumber"
                   name="pPhone"
+                  value={player.pPhone}
+                  maxLength="10"
+                  minLength="10"
                   onChange={handleChange}
                   required
                 />
@@ -146,13 +249,15 @@ const RegistrationPage = () => {
                   </label>
                 </div>
                 <input
-                  type="number"
+                  type="text"
                   className="form-control"
                   id="whatsappnumber"
                   name="pWhatsapp"
-                  value={contactCheck ? player.pPhone : player.pWhatsapp}
+                  value={player.pWhatsapp}
                   onChange={handleChange}
                   readOnly={contactCheck}
+                  maxLength="10"
+                  minLength="10"
                   placeholder={contactCheck ? player.pPhone : ""}
                 />
               </div>
@@ -173,26 +278,7 @@ const RegistrationPage = () => {
                 <label htmlFor="pimage" className="form-label">
                   Profile Image
                 </label>
-                <input
-                  type="file"
-                  accept=".jpg,.jpeg,.png"
-                  className="form-control"
-                  id="pimage"
-                  name="pImage"
-                  onChange={handleChange}
-                  required
-                />
-              </div>
-              <div className="col-md-6">
-                {pImage && (
-                  <img
-                    src={URL.createObjectURL(pImage)}
-                    width="100px"
-                    height="100px"
-                    alt={player.pName}
-                    className="img-fluid"
-                  />
-                )}
+                <Upload setpImage={setpImage} />
               </div>
               <div className="mb-2">
                 <label htmlFor="prole" className="form-label">
@@ -297,7 +383,6 @@ const RegistrationPage = () => {
                   </div>
                 </div>
               </div>
-
               <div className="mb-2">
                 <label htmlFor="pkitsize" className="form-label">
                   Player Kit Size

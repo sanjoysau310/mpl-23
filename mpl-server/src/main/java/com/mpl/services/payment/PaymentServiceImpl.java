@@ -62,7 +62,7 @@ public class PaymentServiceImpl implements PaymentService {
 		System.out.println("created txn order id------------------------------------------"+orderId);
 		TreeMap<String, String> parameters = new TreeMap<>();
 		paytmBean.getDetails().forEach((k, v) -> parameters.put(k, v));
-		parameters.put("MOBILE_NO", player.getpPhone());
+		parameters.put("MOBILE_NO", "+91"+player.getpPhone());
 		parameters.put("EMAIL", player.getpEmail());
 		parameters.put("ORDER_ID", orderId);
 		parameters.put("CUST_ID", "CUSTID_" + player.getpId());
@@ -100,7 +100,8 @@ public class PaymentServiceImpl implements PaymentService {
 					result = "Payment Failed";
 				}
 			} else {
-				result = "Checksum mismatched";
+				//Checksum mismatched
+				result = "Payment Unsuccessful";
 			}
 		} catch (Exception e) {
 			result = e.toString();

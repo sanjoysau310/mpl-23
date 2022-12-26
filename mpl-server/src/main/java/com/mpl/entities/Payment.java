@@ -14,7 +14,7 @@ import lombok.Data;
 
 @Component
 @JsonIgnoreProperties
-@Document(collection = "players_test_trxn")
+@Document(collection = "players_trxn_test")
 @Data
 public class Payment {
 

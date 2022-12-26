@@ -9,6 +9,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -21,7 +22,7 @@ import com.mpl.services.security.CustomUserDetailsService;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
 	@Autowired
 	private CustomUserDetailsService customUserDetailsService;
@@ -32,10 +33,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 	@Autowired
 	private JWTAuthFilter jwtAuthFilter;
 
-
-    
-    @Override
-	public void configure(AuthenticationManagerBuilder auth) throws Exception{
+	@Override
+	public void configure(AuthenticationManagerBuilder auth) throws Exception {
 		auth.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
 	}
 
@@ -43,7 +42,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
+
 	@Bean
 	@Override
 	public AuthenticationManager authenticationManagerBean() throws Exception {
@@ -52,14 +51,27 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable()
-		.authorizeRequests()
-		.antMatchers(HttpMethod.POST,"api/v1/auth/**").permitAll()
-		.anyRequest().authenticated().and().exceptionHandling()
-		.authenticationEntryPoint(jwtAuthEntryPoint).and()
-		.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-		
+		http.csrf().disable().cors().and().authorizeRequests()
+				.antMatchers("/api/v1/auth/**").permitAll()
+				.antMatchers("/api/v1/player/register").permitAll()
+				.antMatchers("/api/v1/player/checkemail/{pEmail}").permitAll()
+				.antMatchers("/api/v1/player/checkphone/{pPhone}").permitAll()
+				.antMatchers("/api/v1/player/playersview").permitAll()
+				.antMatchers("/api/v1/payment/pgdetails/{pId}").permitAll()
+				.antMatchers("/api/v1/payment/pgresponse").permitAll()
+				.antMatchers("/api/v1/team/teamscaptains").permitAll()
+				//.antMatchers(HttpMethod.GET, "api/v1/player/playerview/{pEmail}").authenticated()
+				.anyRequest()
+				.authenticated()
+				.and().exceptionHandling().authenticationEntryPoint(jwtAuthEntryPoint).and()
+				.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
 		http.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 	}
+
+//	@Override
+//	public void configure(WebSecurity web) throws Exception {
+//	    web.ignoring().antMatchers(HttpMethod.GET,"api/v1/payment/pgresponse");
+//	}
 
 }

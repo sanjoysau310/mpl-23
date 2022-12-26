@@ -13,9 +13,6 @@ import com.mpl.entities.Player;
 @Repository
 public interface LoginRepository extends MongoRepository<Login, String>{
 	
-	@Query("{email :?0}")
-    Login getLoginDetailsByEmail(String  email);
-	
-	Optional<Login> findByEmail(String email);
+	Optional<Login> findByUsername(String username);
 
 }
