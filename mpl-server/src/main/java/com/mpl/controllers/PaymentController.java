@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mpl.entities.Payment;
-import com.mpl.entities.Player;
+import com.mpl.payloads.PlayerDto;
 import com.mpl.services.payment.PaymentService;
 import com.mpl.services.player.PlayerService;
 
@@ -45,7 +45,7 @@ public class PaymentController {
 		//save payment status to player table
 		//URIBuilder uriBuilder=new URIBuilder();
 		//uriBuilder..addParameter("Payment Status", payment.getDetails().get("result"));
-		Player player=playerService.updatePlayerPaymentStatus(request, payment.getpId(),payment.getDetails().get("result"));
+		PlayerDto player=playerService.updatePlayerPaymentStatus(request, payment.getpId(),payment.getDetails().get("result"));
 		if(payment.getDetails().get("STATUS").equals("TXN_SUCCESS")) {
 			return ResponseEntity.status(HttpStatus.FOUND).location(URI.create("http://localhost:4200/playerview/"+player.getpEmail())).build();
 		} else if(payment.getDetails().get("STATUS").equals("TXN_FAILURE")) {

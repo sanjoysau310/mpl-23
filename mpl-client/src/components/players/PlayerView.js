@@ -186,7 +186,8 @@ export const PlayerView = () => {
                 </div>
               </div>
             </div>
-            {player.pPaymentMode === "Online" ? (
+            {/* this features will be added soon */}
+            {/* {player.pPaymentMode === "Online" ? (
               player.pPaymentStatus !== "Payment Successful" ? (
                 <div>
                   <button className="btn btn-primary" onClick={makePayment}>
@@ -198,7 +199,7 @@ export const PlayerView = () => {
               )
             ) : (
               ""
-            )}
+            )}  */}
           </div>
         </div>
       </div>

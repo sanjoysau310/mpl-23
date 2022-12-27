@@ -14,21 +14,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mpl.entities.Email;
 import com.mpl.entities.Player;
 import com.mpl.entities.PlayerSequence;
-import com.mpl.entities.PlayersView;
-import com.mpl.entities.Team;
 import com.mpl.exceptions.PlayerNotFoundException;
 import com.mpl.payloads.PlayerDto;
+import com.mpl.payloads.PlayersViewDto;
 import com.mpl.repositories.PlayerRepository;
-import com.mpl.repositories.PlayersViewRepository;
+import com.mpl.services.drive.FileManagerService;
 import com.mpl.services.email.EmailService;
 import com.mpl.services.login.LoginService;
-import com.mpl.services.team.TeamService;
-import com.mpl.services.drive.FileManagerService;
-import com.mpl.utils.CalculateAge;
 import com.mpl.utils.CalculateFees;
 import com.mpl.utils.EmailSetup;
+
 import static org.springframework.data.mongodb.core.FindAndModifyOptions.options;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -44,10 +42,6 @@ public class PlayerServieImpl implements PlayerService {
 	private PlayerRepository playerRepository;
 	
 	@Autowired
-	private PlayersViewRepository playersViewRepository;
-	
-	
-	@Autowired
 	private LoginService loginService;
 
 	@Autowired
@@ -57,13 +51,10 @@ public class PlayerServieImpl implements PlayerService {
 	private EmailService emailService;
 	
 	@Autowired
-	private TeamService teamService;
-	
-	@Autowired
 	private ObjectMapper objectMapper;
 
 	@Override
-	public Player registerPlayer(HttpServletRequest request, String player, MultipartFile file) {
+	public PlayerDto registerPlayer(HttpServletRequest request, String player, MultipartFile file) {
 		Player playerData = null;
 		try {
 			playerData=objectMapper.readValue(player, Player.class);
@@ -81,13 +72,11 @@ public class PlayerServieImpl implements PlayerService {
 		playerData.setpImage(fileId);
 		//save login details
 		loginService.createLoginDetails(playerData.getpEmail(), playerData.getpPassword(), playerData.getpPhone());
-		
-		//remove pass words
+		//remove passwords
 		playerData.setpPassword("");
 		playerData.setpConfirmPassword("");
 		//add player details
 		Player registeredPlayer = playerRepository.save(playerData);
-		
 		// send registration email
 		Email email=new Email();
 		email.setRecipient(registeredPlayer.getpEmail());
@@ -95,7 +84,7 @@ public class PlayerServieImpl implements PlayerService {
 		email.setMsgBody(EmailSetup.getEmailBodyForRegistration(request, registeredPlayer));
 		emailService.sendSimpleMail(email);
 		
-		return registeredPlayer;
+		return playerToPlayerDto(registeredPlayer);
 	}
 	
 	public Integer generateSequence(String seqName) {
@@ -105,16 +94,12 @@ public class PlayerServieImpl implements PlayerService {
 	    return !Objects.isNull(counter) ? counter.getSeq() : 1;
 	}
 	
-	public Player updatePlayerPaymentStatus(HttpServletRequest request, Integer pId, String paymentResult) {
+	public PlayerDto updatePlayerPaymentStatus(HttpServletRequest request, Integer pId, String paymentResult) {
 		Query query = new Query(Criteria.where("pId").is(pId));
 		@SuppressWarnings("static-access")
 		Update update = new Update().update("pPaymentStatus", paymentResult);
 		Player updatedPlayer = mongoOperations.findAndModify(query, update, options().returnNew(true).upsert(true),
 				Player.class);
-		
-		//fetch login details
-		//Login loginBean=mongoOperations.findOne(new Query(Criteria.where("email").is(updatedPlayer.getpEmail())), Login.class);
-		
 		// send online payment successful details email
 		Email email=new Email();
 		email.setRecipient(updatedPlayer.getpEmail());
@@ -122,28 +107,36 @@ public class PlayerServieImpl implements PlayerService {
 		email.setMsgBody(EmailSetup.getEmailBodyForPayment(request, updatedPlayer));
 		emailService.sendSimpleMail(email);
 		
-		return updatedPlayer;
+		return playerToPlayerDto(updatedPlayer);
 	}
 
 	@Override
-	public List<Player> getAllPlayers() {
-		return playerRepository.findAll();
+	public List<PlayerDto> getAllPlayers() {
+		List<Player> playerList=playerRepository.findAll();
+		List<PlayerDto> playerDtoList=new ArrayList<>();
+		for(Player player:playerList)
+			playerDtoList.add(playerToPlayerDto(player));
+		return playerDtoList;
 	}
 
 	@Override
-	public List<PlayersView> getPlayersView() {
-		return playersViewRepository.findAll();
+	public List<PlayersViewDto> getPlayersView() {
+		List<Player> playerList=playerRepository.findAll();
+		List<PlayersViewDto> playerViewDtoList=new ArrayList<>();
+		for(Player player:playerList)
+			playerViewDtoList.add(playerToPlayerViewDto(player));
+		return playerViewDtoList;
 	}
 	@Override
-	public Player getPlayerByEmail(String pEmail) {
-		return playerRepository.findByEmail(pEmail);
+	public PlayerDto getPlayerByEmail(String pEmail) {
+		return playerToPlayerDto(playerRepository.findByEmail(pEmail));
 	}
 
 	@Override
-	public Player getPlayerById(Integer pId) {
+	public PlayerDto getPlayerById(Integer pId) {
 		if(!mongoOperations.exists(new Query(Criteria.where("pId").is(pId)), Player.class))
 			throw new PlayerNotFoundException(pId);
-		return playerRepository.getPlayerById(pId);
+		return playerToPlayerDto(playerRepository.getPlayerById(pId));
 	}
 
 	@Override
@@ -159,7 +152,7 @@ public class PlayerServieImpl implements PlayerService {
 	}
 	
 	@Override
-	public Player editPlayerData(HttpServletRequest request,String playerData) {
+	public PlayerDto editPlayerData(HttpServletRequest request,String playerData) {
 		Player player = null;
 		try {
 			player=objectMapper.readValue(playerData, Player.class);
@@ -175,7 +168,6 @@ public class PlayerServieImpl implements PlayerService {
 		update.set("pPaymentStatus", player.getpPaymentStatus());
 		Player editedPlayer = mongoOperations.findAndModify(query, update, options().returnNew(true).upsert(true),
 				Player.class);
-		
 		// send payment successful details email
 		if(editedPlayer.getpPaymentStatus().equals("Payment Successful")) {
 			Email email=new Email();
@@ -184,13 +176,11 @@ public class PlayerServieImpl implements PlayerService {
 			email.setMsgBody(EmailSetup.getEmailBodyForPayment(request, editedPlayer));
 			emailService.sendSimpleMail(email);	
 		}
-				
-		
-		return editedPlayer;
+		return playerToPlayerDto(editedPlayer);
 	}
 
 	@Override
-	public Player updatePlayerData(String playerData) {
+	public PlayerDto updatePlayerData(String playerData) {
 		Player player = null;
 		try {
 			player=objectMapper.readValue(playerData, Player.class);
@@ -204,11 +194,9 @@ public class PlayerServieImpl implements PlayerService {
 		update.set("pStatus", player.getpStatus());
 		Player updatedPlayer = mongoOperations.findAndModify(query, update, options().returnNew(true).upsert(true),
 				Player.class);
-		
 		//update to teams table
 		//teamService.updatePlayerTeam(player);
-		
-		return updatedPlayer;
+		return playerToPlayerDto(updatedPlayer);
 	}
 	
 	@Override
@@ -221,50 +209,15 @@ public class PlayerServieImpl implements PlayerService {
 	
 	private Player playertDtoToPlayer(PlayerDto playerDto) {
 		Player player=new Player();
-		
-//		player.setpId(playerDto.getPId());
-//		player.setpName(playerDto.getPName());
-//		player.setpEmail(playerDto.getPEmail());
-//		player.setpPhone(playerDto.getPPhone());
-//		player.setpWhatsapp(playerDto.getPWhatsapp());
-//		player.setpDob(playerDto.getPDob());
-//		player.setpImage(playerDto.getPImage());
-//		player.setpRole(playerDto.getPRole());
-//		player.setpBatting(playerDto.getPBatting());
-//		player.setpBowling(playerDto.getPBowling());
-//		player.setpKit(playerDto.getPKit());
-//		player.setpFees(playerDto.getPFees());
-//		player.setpBasePrice(playerDto.getPBasePrice());
-//		player.setpSoldPrice(playerDto.getPBasePrice());
-//		player.setpTeam(playerDto.getPTeam());
-//		player.setpStatus(playerDto.getPStatus());
-//		player.setpPaymentMode(playerDto.getPPaymentMode());
-//		player.setpPaymentStatus(playerDto.getPPaymentStatus());
 		return objectMapper.convertValue(playerDto, Player.class);
 	}
 
 	private PlayerDto playerToPlayerDto(Player player) {
 		PlayerDto playerDto=new PlayerDto();
-		
-//		playerDto.setPId(player.getpId());
-//		playerDto.setPName(player.getpName());
-//		playerDto.setPEmail(player.getpEmail());
-//		playerDto.setPPhone(player.getpPhone());
-//		playerDto.setPWhatsapp(player.getpWhatsapp());
-//		playerDto.setPDob(player.getpDob());
-//		playerDto.setPImage(player.getpImage());
-//		playerDto.setPRole(player.getpRole());
-//		playerDto.setPBatting(player.getpBatting());
-//		playerDto.setPBowling(player.getpBowling());
-//		playerDto.setPKit(player.getpKit());
-//		playerDto.setPFees(player.getpFees());
-//		playerDto.setPBasePrice(player.getpBasePrice());
-//		playerDto.setPSoldPrice(player.getpSoldPrice());
-//		playerDto.setPTeam(player.getpTeam());
-//		playerDto.setPStatus(player.getpStatus());
-//		playerDto.setPPaymentMode(player.getpPaymentMode());
-//		playerDto.setPPaymentStatus(player.getpPaymentSatus());
 		return objectMapper.convertValue(player, PlayerDto.class);
 	}
 
+	private PlayersViewDto playerToPlayerViewDto(Player player) {
+		return objectMapper.convertValue(player, PlayersViewDto.class);
+	}
 }

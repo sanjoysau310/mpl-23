@@ -1,12 +1,6 @@
 package com.mpl.payloads;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@NoArgsConstructor
-@Getter
-@Setter
 public class PlayerDto {
 	
 	public static final String SEQUENCE_NAME = "players_sequence";	
@@ -28,4 +22,116 @@ public class PlayerDto {
 	private String pStatus;
 	private String pPaymentMode;
 	private String pPaymentStatus;
+	
+	public Integer getpId() {
+		return pId;
+	}
+	public void setpId(Integer pId) {
+		this.pId = pId;
+	}
+	public String getpName() {
+		return pName;
+	}
+	public void setpName(String pName) {
+		this.pName = pName;
+	}
+	public String getpEmail() {
+		return pEmail;
+	}
+	public void setpEmail(String pEmail) {
+		this.pEmail = pEmail;
+	}
+	public String getpPhone() {
+		return pPhone;
+	}
+	public void setpPhone(String pPhone) {
+		this.pPhone = pPhone;
+	}
+	public String getpWhatsapp() {
+		return pWhatsapp;
+	}
+	public void setpWhatsapp(String pWhatsapp) {
+		this.pWhatsapp = pWhatsapp;
+	}
+	public String getpDob() {
+		return pDob;
+	}
+	public void setpDob(String pDob) {
+		this.pDob = pDob;
+	}
+	public String getpImage() {
+		return pImage;
+	}
+	public void setpImage(String pImage) {
+		this.pImage = pImage;
+	}
+	public String getpRole() {
+		return pRole;
+	}
+	public void setpRole(String pRole) {
+		this.pRole = pRole;
+	}
+	public String getpBatting() {
+		return pBatting;
+	}
+	public void setpBatting(String pBatting) {
+		this.pBatting = pBatting;
+	}
+	public String getpBowling() {
+		return pBowling;
+	}
+	public void setpBowling(String pBowling) {
+		this.pBowling = pBowling;
+	}
+	public String getpKit() {
+		return pKit;
+	}
+	public void setpKit(String pKit) {
+		this.pKit = pKit;
+	}
+	public Integer getpFees() {
+		return pFees;
+	}
+	public void setpFees(Integer pFees) {
+		this.pFees = pFees;
+	}
+	public Integer getpBasePrice() {
+		return pBasePrice;
+	}
+	public void setpBasePrice(Integer pBasePrice) {
+		this.pBasePrice = pBasePrice;
+	}
+	public Integer getpSoldPrice() {
+		return pSoldPrice;
+	}
+	public void setpSoldPrice(Integer pSoldPrice) {
+		this.pSoldPrice = pSoldPrice;
+	}
+	public String getpTeam() {
+		return pTeam;
+	}
+	public void setpTeam(String pTeam) {
+		this.pTeam = pTeam;
+	}
+	public String getpStatus() {
+		return pStatus;
+	}
+	public void setpStatus(String pStatus) {
+		this.pStatus = pStatus;
+	}
+	public String getpPaymentMode() {
+		return pPaymentMode;
+	}
+	public void setpPaymentMode(String pPaymentMode) {
+		this.pPaymentMode = pPaymentMode;
+	}
+	public String getpPaymentStatus() {
+		return pPaymentStatus;
+	}
+	public void setpPaymentStatus(String pPaymentStatus) {
+		this.pPaymentStatus = pPaymentStatus;
+	}
+	public static String getSequenceName() {
+		return SEQUENCE_NAME;
+	}
 }

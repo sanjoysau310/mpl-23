@@ -5,7 +5,8 @@ target/
 !**/src/test/**/target/
 
 ### eclipse ###
-**/src/main/resources/application.properties
+.properties
+.json
 
 ### STS ###
 .apt_generated

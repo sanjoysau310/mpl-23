@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.mpl.entities.Player;
-import com.mpl.entities.PlayersView;
+import com.mpl.payloads.PlayerDto;
+import com.mpl.payloads.PlayersViewDto;
 import com.mpl.services.player.PlayerService;
 
 
@@ -33,7 +33,7 @@ public class PlayerController {
 	private PlayerService playerService;
 
 	@PostMapping(path = "/register", consumes = { MediaType.APPLICATION_JSON_VALUE,MediaType.MULTIPART_FORM_DATA_VALUE })
-	public Player registerPlayer( HttpServletRequest request,@RequestParam("player") String player, @RequestParam("pImage") MultipartFile file) {
+	public PlayerDto registerPlayer( HttpServletRequest request,@RequestParam("player") String player, @RequestParam("pImage") MultipartFile file) {
 		return playerService.registerPlayer(request, player,file);	
 	}
 	
@@ -48,34 +48,33 @@ public class PlayerController {
 	}
 
 	@GetMapping("/playerslist")
-	List<Player> getAllPlayers() {
+	List<PlayerDto> getAllPlayers() {
 		return playerService.getAllPlayers();
 	}
 	
 	@GetMapping("/playersview")
-	List<PlayersView> getPlayersView() {
+	List<PlayersViewDto> getPlayersView() {
 		return playerService.getPlayersView();
 	}
 	
 	@GetMapping("/playerview/{pEmail}")
-	Player getPlayerView(@PathVariable String pEmail) {
+	PlayerDto getPlayerView(@PathVariable String pEmail) {
 		return playerService.getPlayerByEmail(pEmail);
 	}
 
 	@GetMapping("/playerid/{pId}")
-	Player getPlayer(@PathVariable Integer pId) {
+	PlayerDto getPlayer(@PathVariable Integer pId) {
 		return playerService.getPlayerById(pId);
 	}
 	
 	@PutMapping("/editplayer")
-	Player editPlayer(HttpServletRequest request,@RequestBody String playerData) {
+	PlayerDto editPlayer(HttpServletRequest request,@RequestBody String playerData) {
 		return playerService.editPlayerData(request,playerData);
 	}
 	
 	//@PreAuthorize("hasrole('ADMIN')")
 	@PutMapping("/updateplayer")
-	Player updatePlayer(@RequestBody String playerData) {
-		System.out.println("update data::::::::::---------------"+playerData);
+	PlayerDto updatePlayer(@RequestBody String playerData) {
 		return playerService.updatePlayerData(playerData);
 		
 	}

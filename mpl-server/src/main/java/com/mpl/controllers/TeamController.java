@@ -25,7 +25,6 @@ public class TeamController {
 
 	@PutMapping("/updateplayerdata")
 	Team addPlayerTeam(@RequestBody String playerData) {
-		System.out.println("update data::::::::::---------------" + playerData);
 		teamService.updatePlayerTeam(playerData);
 		return null;
 	}
@@ -51,14 +50,12 @@ public class TeamController {
 	@GetMapping("/teamscaptains")
 	List<Team> getTeamsCaptains() {
 		List<Team> teamsCaptains = teamService.getTeamsCaptains();
-		System.out.println("teammmmmm-------------" + teamsCaptains.toString());
 		return teamsCaptains;
 	}
 
 	@GetMapping("/teamsplayers")
 	List<Team> getTeamsPlayers() {
 		List<Team> teamsPlayers = teamService.getTeamsPlayers();
-		System.out.println("teammmmmm-------------" + teamsPlayers.toString());
 		return teamsPlayers;
 	}
 }

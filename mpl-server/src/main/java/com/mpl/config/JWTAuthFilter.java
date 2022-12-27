@@ -38,7 +38,6 @@ public class JWTAuthFilter extends OncePerRequestFilter {
 		final String requestTokenHeader = request.getHeader("Authorization");
 		String username = null;
 		String jwtToken = null;
-		System.out.println("Request header::::::::::::----------------------"+requestTokenHeader);
 		try {
 			if (requestTokenHeader != null && requestTokenHeader.startsWith("Bearer")) {
 				jwtToken = requestTokenHeader.substring(7);
@@ -84,6 +83,5 @@ public class JWTAuthFilter extends OncePerRequestFilter {
 				null, null, null);
 		SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 		request.setAttribute("claims", ex.getClaims());
-
 	}
 }

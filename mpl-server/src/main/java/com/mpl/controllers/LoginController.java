@@ -25,26 +25,22 @@ public class LoginController {
 	
 	@PostMapping("/addlogin")
 	public Login createLoginDetails(@RequestBody Login login) {
-		System.out.println("player request-----------------------------------"+login);
 		return loginService.createLoginDetails(login.getUsername(), login.getPassword(), login.getPhone());
 	}
 	
 	@PostMapping("/login")
 	public ResponseEntity<JWTAuthResponse> createToken(@RequestBody JWTAuthRequest request) {
-		System.out.println("player request-----------------------------------"+request);
 		return loginService.authenticatePlayer(request.getUsername(),request.getPassword());
 	}
 	
 	@PostMapping("/refreshToken")
 	public ResponseEntity<?> refreshToken(@RequestBody HttpServletRequest request) {
-		System.out.println("player request-----------------------------------"+request);
 		//return loginService.authenticatePlayer(request.getUsername(),request.getPassword());
 		return loginService.refreshToken(request);
 	}
 	
 	@PostMapping("/logout")
 	public String removeToken(@RequestBody String token) {
-		System.out.println("player request-----------------------------------"+token);
 		//return loginService.authenticatePlayer(request.getUsername(),request.getPassword());
 		return null;
 	}

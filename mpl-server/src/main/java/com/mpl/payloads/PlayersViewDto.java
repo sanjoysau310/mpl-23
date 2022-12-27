@@ -1,12 +1,5 @@
 package com.mpl.payloads;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
-@NoArgsConstructor
-@Getter
-@Setter
 public class PlayersViewDto {
 
 	private Integer pId;
@@ -15,4 +8,41 @@ public class PlayersViewDto {
 	private String pStatus;
 	private String pPaymentMode;
 	private String pPaymentStatus;
+	
+	public Integer getpId() {
+		return pId;
+	}
+	public void setpId(Integer pId) {
+		this.pId = pId;
+	}
+	public String getpName() {
+		return pName;
+	}
+	public void setpName(String pName) {
+		this.pName = pName;
+	}
+	public String getpTeam() {
+		return pTeam;
+	}
+	public void setpTeam(String pTeam) {
+		this.pTeam = pTeam;
+	}
+	public String getpStatus() {
+		return pStatus;
+	}
+	public void setpStatus(String pStatus) {
+		this.pStatus = pStatus;
+	}
+	public String getpPaymentMode() {
+		return pPaymentMode;
+	}
+	public void setpPaymentMode(String pPaymentMode) {
+		this.pPaymentMode = pPaymentMode;
+	}
+	public String getpPaymentStatus() {
+		return pPaymentStatus;
+	}
+	public void setpPaymentStatus(String pPaymentStatus) {
+		this.pPaymentStatus = pPaymentStatus;
+	}
 }

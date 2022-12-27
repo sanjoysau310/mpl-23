@@ -19,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.mpl.services.security.CustomUserDetailsService;
 
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -60,7 +61,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 				.antMatchers("/api/v1/payment/pgdetails/{pId}").permitAll()
 				.antMatchers("/api/v1/payment/pgresponse").permitAll()
 				.antMatchers("/api/v1/team/teamscaptains").permitAll()
-				//.antMatchers(HttpMethod.GET, "api/v1/player/playerview/{pEmail}").authenticated()
 				.anyRequest()
 				.authenticated()
 				.and().exceptionHandling().authenticationEntryPoint(jwtAuthEntryPoint).and()

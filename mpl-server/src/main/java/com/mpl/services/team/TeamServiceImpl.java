@@ -52,7 +52,6 @@ public class TeamServiceImpl implements TeamService {
 		}
 		
 		Query query = new Query(Criteria.where("pId").is(team.getpId()));
-		System.out.println("query------------------"+query.toString());
 		Update update = new Update();
 		update.set("pTeam", team.getpTeam());
 		update.set("pSoldPrice", team.getpSoldPrice());
@@ -84,9 +83,7 @@ public class TeamServiceImpl implements TeamService {
 	}
 	@Override
 	public List<Team> getTeamsCaptains() {
-		//List<Team> teamCapatains=teamsRepository.getTeamsCaptains();
 		List<Team> teamCapatains=teamsRepository.findByRole("CAPTAIN");
-		System.out.println("capatain list---------------"+teamCapatains.toString());
 		return teamCapatains;
 	}
 }

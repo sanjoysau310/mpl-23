@@ -45,7 +45,6 @@ public class PaymentServiceImpl implements PaymentService {
 	public Payment getPaymentAfterUpdate(Map<String, String> details) {
 
 		String orderId = details.get("ORDERID");
-		System.out.println("after txn order id-----------------------"+orderId);
 		Query query = new Query(Criteria.where("orderId").is(orderId));
 		@SuppressWarnings("static-access")
 		Update update = new Update().update("details", details);
@@ -59,7 +58,6 @@ public class PaymentServiceImpl implements PaymentService {
 
 		Player player = playerRepository.getPlayerById(id);
 		String orderId = UUID.randomUUID().toString();
-		System.out.println("created txn order id------------------------------------------"+orderId);
 		TreeMap<String, String> parameters = new TreeMap<>();
 		paytmBean.getDetails().forEach((k, v) -> parameters.put(k, v));
 		parameters.put("MOBILE_NO", "+91"+player.getpPhone());
@@ -71,7 +69,6 @@ public class PaymentServiceImpl implements PaymentService {
 		// save orderid and pid to txn table
 		paymentBean.setOrderId(orderId);
 		paymentBean.setpId(id);
-		System.out.println("before txn order id------------------------------------------"+paymentBean.getOrderId());
 		paymentRepository.save(paymentBean);
 		return parameters;
 	}
