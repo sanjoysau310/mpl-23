@@ -80,13 +80,13 @@ export default function ContactPage() {
                   href="https://goo.gl/maps/EF42HDYenoQnzdiTA"
                   className="text-info"
                 >
-                  <i className="fas fa-map-marker-alt fa-2x" />
+                  <i className="fa-solid fa-map-location-dot fa-2x" />
                 </a>
                 <p>Katjunagar Play Ground, Jadavpur, Kolkata</p>
               </li>
               <li>
                 <a href="tel:+916289674153" className="text-info">
-                  <i className="fas fa-phone mt-4 fa-2x" />
+                  <i className="fa-solid fa-phone mt-4 fa-2x" />
                 </a>
                 <p>Call us for more details</p>
               </li>
@@ -95,9 +95,18 @@ export default function ContactPage() {
                   href="mailto:musketeerspremierleague@gmail.com"
                   className="text-info"
                 >
-                  <i className="fas fa-envelope mt-4 fa-2x" />
+                  <i className="fa-solid fa-envelope mt-4 fa-2x" />
                 </a>
                 <p>musketeerspremierleague@gmail.com</p>
+              </li>
+              <li>
+                <a
+                  href="https://instagram.com/mus_keteersclub?igshid=YmMyMTA2M2Y="
+                  className="text-info"
+                >
+                  <i className="fa-brands fa-square-instagram mt-4 fa-2x" />
+                </a>
+                <p>mus_keteersclub</p>
               </li>
             </ul>
           </div>

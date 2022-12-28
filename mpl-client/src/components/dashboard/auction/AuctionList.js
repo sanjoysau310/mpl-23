@@ -26,8 +26,8 @@ export default function AuctionList() {
               <th scope="col">Role</th>
               <th scope="col">Bating</th>
               <th scope="col">Bowling</th>
-              <th scope="col">Team</th>
-              <th scope="col">Status</th>
+              {/* <th scope="col">Team</th>
+              <th scope="col">Status</th> */}
             </tr>
           </thead>
           <tbody>
@@ -38,8 +38,8 @@ export default function AuctionList() {
                 <td>{player.pRole}</td>
                 <td>{player.pBatting}</td>
                 <td>{player.pBowling}</td>
-                <td>{player.pTeam}</td>
-                <td>{player.pStatus}</td>
+                {/* <td>{player.pTeam}</td>
+                <td>{player.pStatus}</td> */}
               </tr>
             ))}
           </tbody>

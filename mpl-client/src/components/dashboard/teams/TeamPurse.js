@@ -16,7 +16,7 @@ const TeamPurse = () => {
   ];
 
   const [teamsPlayers, setTeamsPlayers] = useState([]);
-  const [purse, setPurse] = useState(2000);
+  const [purse, setPurse] = useState(3000);
 
   useEffect(() => {
     loadTeams();

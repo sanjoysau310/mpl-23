@@ -27,6 +27,8 @@ export default function PlayerAuction() {
   const [playerData, setPlayerData] = useState({
     pId: "",
     pName: "",
+    pRole: "",
+    pBasePrice: "",
     pTeam: "",
     pSoldPrice: "",
     pStatus: "",
@@ -42,6 +44,7 @@ export default function PlayerAuction() {
     setPlayerData({
       pId: player.pId,
       pName: player.pName,
+      pRole: player.pRole,
       pBasePrice: player.pBasePrice ? player.pBasePrice : "",
       pTeam: player.pTeam ? player.pTeam : "",
       pSoldPrice: player.pSoldPrice ? player.pSoldPrice : "",
@@ -115,7 +118,6 @@ export default function PlayerAuction() {
   return (
     <div style={myStyle}>
       <div className="container text-light mt-3">
-        {console.log(playerData)}
         <div className="text-center">
           <h2>MPL 2023 Player Auction</h2>
         </div>
@@ -272,7 +274,7 @@ export default function PlayerAuction() {
                         [e.target.name]: e.target.value,
                       });
                     }}
-                    disabled={flag || currentBid === player.pBasePrice}
+                    //disabled={flag || currentBid === player.pBasePrice}
                   >
                     {teamNames.map((teamName) => (
                       <option key={teamName} name={teamName} value={teamName}>

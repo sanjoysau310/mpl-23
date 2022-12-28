@@ -227,16 +227,16 @@ export default function EventPage() {
                 </h5>
                 &emsp;Teams will have to do shopping for exactly 10 players
                 (Excluding captain) from 5 different groups(Group- A, Group- B,
-                Group- C, Group- D, Group- E) with the purse limit of 2000
+                Group- C, Group- D, Group- E) with the purse limit of 3000
                 points. Any player will not be part of any team free. Teams need
                 minimum points to build their full squad. Notably, Each team
                 must require one player from Group-E.
               </li>
               <li>
-                <h5>Rule 2 – Minimum 80% to be spent by each Team:</h5>
+                <h5>Rule 2 – Minimum 90% to be spent by each Team:</h5>
                 &emsp;As per the MPL Committee ruling, it is mandatory for the
-                teams to spend a minimum 80% of the total purse of 3000
-                points(i.e. At Least 1600 points to be spent).
+                teams to spend a minimum 90% of the total purse of 3000
+                points(i.e. At Least 2700 points to be spent).
               </li>
             </ul>
           </ul>

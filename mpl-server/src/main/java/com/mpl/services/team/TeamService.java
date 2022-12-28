@@ -10,12 +10,13 @@ import com.mpl.entities.Team;
 @Service
 public interface TeamService {
 
-	void addToTeams(Player player);
-	void updatePlayerTeam(String playerData);
+	Team addToTeams(Player player);
+	Team updatePlayerTeam(String playerData);
 	List<Team> getSoldPlayers();
 	List<Team> getUnSoldPlayers();
 	List<String> getTeams();
 	List<Team> getTeamsPlayers();
 	List<Team> getTeamsCaptains();
+	void editPlayerTeam(String playerData);
 	
 }

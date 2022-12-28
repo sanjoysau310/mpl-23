@@ -134,4 +134,22 @@ public class PlayerDto {
 	public static String getSequenceName() {
 		return SEQUENCE_NAME;
 	}
+	@Override
+	public String toString() {
+		return "PlayerDto [pId=" + pId + ", pName=" + pName + ", pEmail=" + pEmail + ", pPhone=" + pPhone
+				+ ", pWhatsapp=" + pWhatsapp + ", pDob=" + pDob + ", pImage=" + pImage + ", pRole=" + pRole
+				+ ", pBatting=" + pBatting + ", pBowling=" + pBowling + ", pKit=" + pKit + ", pFees=" + pFees
+				+ ", pBasePrice=" + pBasePrice + ", pSoldPrice=" + pSoldPrice + ", pTeam=" + pTeam + ", pStatus="
+				+ pStatus + ", pPaymentMode=" + pPaymentMode + ", pPaymentStatus=" + pPaymentStatus + ", getpId()="
+				+ getpId() + ", getpName()=" + getpName() + ", getpEmail()=" + getpEmail() + ", getpPhone()="
+				+ getpPhone() + ", getpWhatsapp()=" + getpWhatsapp() + ", getpDob()=" + getpDob() + ", getpImage()="
+				+ getpImage() + ", getpRole()=" + getpRole() + ", getpBatting()=" + getpBatting() + ", getpBowling()="
+				+ getpBowling() + ", getpKit()=" + getpKit() + ", getpFees()=" + getpFees() + ", getpBasePrice()="
+				+ getpBasePrice() + ", getpSoldPrice()=" + getpSoldPrice() + ", getpTeam()=" + getpTeam()
+				+ ", getpStatus()=" + getpStatus() + ", getpPaymentMode()=" + getpPaymentMode()
+				+ ", getpPaymentStatus()=" + getpPaymentStatus() + ", getClass()=" + getClass() + ", hashCode()="
+				+ hashCode() + ", toString()=" + super.toString() + "]";
+	}
+	
+	
 }

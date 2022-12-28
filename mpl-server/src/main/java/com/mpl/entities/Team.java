@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Component
-@Document(collection = "players_team_test")
+@Document(collection = "mpl_2023_team")
 @JsonIgnoreProperties
 public class Team {
 	

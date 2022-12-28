@@ -2,6 +2,7 @@ package com.mpl.services.login;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -16,4 +17,6 @@ public interface LoginService {
 	Login createLoginDetails(String email, String password, String phone);
 
 	ResponseEntity<?> refreshToken(HttpServletRequest request);
+
+	void deleteBypEmail(String username);
 }

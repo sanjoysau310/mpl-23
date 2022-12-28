@@ -61,7 +61,7 @@ public class LoginServiceImpl implements LoginService {
 		try {
 			authenticationManager.authenticate(authenticationToken);
 		} catch (BadCredentialsException e) {
-			System.out.println("Invalid details");
+			//System.out.println("Invalid details");
 			throw new ApiException("Invalid username or password");
 		}
 		UserDetails userDetails=customUserDetailsService.loadUserByUsername(username);
@@ -89,5 +89,10 @@ public class LoginServiceImpl implements LoginService {
 			expectedMap.put(entry.getKey(), (UserDetails) entry.getValue());
 		}
 		return expectedMap;
+	}
+
+	@Override
+	public void deleteBypEmail(String username) {
+		loginRepository.deleteBypEmail(username);
 	}
 }

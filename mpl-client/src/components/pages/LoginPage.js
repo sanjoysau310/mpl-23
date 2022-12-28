@@ -81,10 +81,7 @@ const LoginPage = () => {
                   required
                 />
                 <div className="input-group-btn">
-                  <span
-                    className="btn btn-outline-secondary"
-                    onClick={togglePassword}
-                  >
+                  <span className="form-control" onClick={togglePassword}>
                     {passwordType === "password" ? (
                       <i className="fa-solid fa-eye" />
                     ) : (

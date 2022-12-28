@@ -21,6 +21,7 @@ import com.mpl.repositories.PlayerRepository;
 import com.mpl.services.drive.FileManagerService;
 import com.mpl.services.email.EmailService;
 import com.mpl.services.login.LoginService;
+import com.mpl.services.team.TeamService;
 import com.mpl.utils.CalculateFees;
 import com.mpl.utils.EmailSetup;
 
@@ -49,6 +50,9 @@ public class PlayerServieImpl implements PlayerService {
 
 	@Autowired
 	private EmailService emailService;
+	
+	@Autowired
+	private TeamService teamService;
 	
 	@Autowired
 	private ObjectMapper objectMapper;
@@ -168,6 +172,10 @@ public class PlayerServieImpl implements PlayerService {
 		update.set("pPaymentStatus", player.getpPaymentStatus());
 		Player editedPlayer = mongoOperations.findAndModify(query, update, options().returnNew(true).upsert(true),
 				Player.class);
+		
+		//update team table
+		//teamService.editPlayerTeam(playerData);
+		
 		// send payment successful details email
 		if(editedPlayer.getpPaymentStatus().equals("Payment Successful")) {
 			Email email=new Email();
@@ -201,19 +209,19 @@ public class PlayerServieImpl implements PlayerService {
 	
 	@Override
 	public String deleteById(Integer pId) {
+		Player player=playerRepository.getPlayerById(pId);
 		if(!mongoOperations.exists(new Query(Criteria.where("pId").is(pId)), Player.class))
 			throw new PlayerNotFoundException(pId);
+		loginService.deleteBypEmail(player.getpEmail());
 		playerRepository.deleteBypId(pId);
 		return "Player with id " +pId+" deleted successfully";
 	}
 	
 	private Player playertDtoToPlayer(PlayerDto playerDto) {
-		Player player=new Player();
 		return objectMapper.convertValue(playerDto, Player.class);
 	}
 
 	private PlayerDto playerToPlayerDto(Player player) {
-		PlayerDto playerDto=new PlayerDto();
 		return objectMapper.convertValue(player, PlayerDto.class);
 	}
 

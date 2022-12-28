@@ -37,6 +37,7 @@ export default function Teams() {
 
   const loadTeams = async () => {
     const result = await PrivateAPI.get("/v1/team/teamsplayers");
+    console.log(result.data);
     setTeamsPlayers(result.data);
   };
 
@@ -73,13 +74,25 @@ export default function Teams() {
         {teamNames.map((teamName) => (
           <div className="col mb-3" key={teamName}>
             <div className="card bg-info">
-              <div className="card-block">
-                <h3 className="text-center mb-3">{teamName}</h3>
-                <div className="row text-center">
-                  <h5>Captain</h5>
+              <div className="card-block text-center">
+                <h3 className="mb-3">{teamName}</h3>
+                {teamsPlayers.map((teamPlayer) => (
+                  <h5 key={teamPlayer.pId}>
+                    {teamPlayer.pTeam === teamName
+                      ? teamPlayer.pStatus === "CAPTAIN"
+                        ? teamPlayer.pName
+                        : ""
+                      : ""}
+                  </h5>
+                ))}
+                <div className="row">
                   {teamsPlayers.map((teamPlayer) => (
-                    <div className="col-md-6" key={teamPlayer}>
-                      {teamPlayer.pTeam === teamName ? teamPlayer.pName : ""}
+                    <div className="col-md-6" key={teamPlayer.pId}>
+                      {teamPlayer.pTeam === teamName
+                        ? teamPlayer.pStatus !== "CAPTAIN"
+                          ? teamPlayer.pName
+                          : ""
+                        : ""}
                     </div>
                   ))}
                 </div>

@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 @Component
-@Document(collection = "players_seq_test")
+@Document(collection = "mpl_2023_players_sequence")
 @Data
 @JsonIgnoreProperties
 public class PlayerSequence {

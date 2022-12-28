@@ -23,7 +23,7 @@ import lombok.Setter;
 
 @SuppressWarnings("serial")
 @Component
-@Document(collection = "players_login_test")
+@Document(collection = "mpl_2023_login")
 @Data
 @JsonIgnoreProperties
 @NoArgsConstructor

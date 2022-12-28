@@ -23,10 +23,14 @@ public class TeamController {
 	@Autowired
 	private TeamService teamService;
 
-	@PutMapping("/updateplayerdata")
+	@PutMapping("/addplayerdata")
 	Team addPlayerTeam(@RequestBody String playerData) {
-		teamService.updatePlayerTeam(playerData);
-		return null;
+		return teamService.updatePlayerTeam(playerData);
+	}
+	
+	@PutMapping("/updateplayerdata")
+	Team updatePlayerTeam(@RequestBody String playerData) {
+		return teamService.updatePlayerTeam(playerData);
 	}
 	
 	@GetMapping("/soldplayers")
@@ -43,19 +47,16 @@ public class TeamController {
 
 	@GetMapping("/teamslist")
 	List<String> getTeams() {
-		List<String> teamslist = teamService.getTeams();
-		return null;
+		return teamService.getTeams();
 	}
 	
 	@GetMapping("/teamscaptains")
 	List<Team> getTeamsCaptains() {
-		List<Team> teamsCaptains = teamService.getTeamsCaptains();
-		return teamsCaptains;
+		return teamService.getTeamsCaptains();
 	}
 
 	@GetMapping("/teamsplayers")
 	List<Team> getTeamsPlayers() {
-		List<Team> teamsPlayers = teamService.getTeamsPlayers();
-		return teamsPlayers;
+		return teamService.getTeamsPlayers();
 	}
 }

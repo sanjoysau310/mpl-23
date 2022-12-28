@@ -15,7 +15,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mpl.entities.Player;
 import com.mpl.entities.Team;
+import com.mpl.payloads.PlayerDto;
 import com.mpl.repositories.TeamsRepository;
+import com.mpl.services.player.PlayerService;
 
 @Service
 public class TeamServiceImpl implements TeamService {
@@ -28,9 +30,12 @@ public class TeamServiceImpl implements TeamService {
 	
 	@Autowired
 	private ObjectMapper objectMapper;
+	
+	@Autowired
+	private PlayerService playerService;
 
 	@Override
-	public void addToTeams(Player player) {
+	public Team addToTeams(Player player) {
 		
 		Team team=new Team();
 		team.setpId(player.getpId());
@@ -40,10 +45,37 @@ public class TeamServiceImpl implements TeamService {
 		team.setpTeam(player.getpTeam());
 		team.setpStatus(player.getpStatus());
 		
-		teamsRepository.save(team);
+		Team addedTeam=teamsRepository.save(team);
+		return addedTeam;
 	}
+	
 	@Override
-	public void updatePlayerTeam(String playerData) {
+	public void editPlayerTeam(String playerData) {
+		Team team = null;
+		try {
+			team=objectMapper.readValue(playerData, Team.class);
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		}
+		//retive player details
+		PlayerDto player=playerService.getPlayerById(team.getpId());
+		//edit team table
+		Query query = new Query(Criteria.where("pId").is(team.getpId()));
+		Update update = new Update();
+		update.set("pName", player.getpName());
+		update.set("pRole", player.getpRole());
+		update.set("pBasePrice", team.getpBasePrice());
+		update.set("pTeam", team.getpTeam());
+		update.set("pSoldPrice", team.getpSoldPrice());
+		update.set("pStatus", team.getpStatus());
+		Team editedTeam = mongoOperations.findAndModify(query, update, options().returnNew(true).upsert(true),
+				Team.class);
+		
+		//teamsRepository.save(team);
+	}
+	
+	@Override
+	public Team updatePlayerTeam(String playerData) {
 		Team team = null;
 		try {
 			team=objectMapper.readValue(playerData, Team.class);
@@ -53,12 +85,15 @@ public class TeamServiceImpl implements TeamService {
 		
 		Query query = new Query(Criteria.where("pId").is(team.getpId()));
 		Update update = new Update();
+		update.set("pName", team.getpName());
+		update.set("pRole", team.getpRole());
+		update.set("pBasePrice", team.getpBasePrice());
 		update.set("pTeam", team.getpTeam());
 		update.set("pSoldPrice", team.getpSoldPrice());
 		update.set("pStatus", team.getpStatus());
 		Team updatedTeam = mongoOperations.findAndModify(query, update, options().returnNew(true).upsert(true),
 				Team.class);
-		
+		return updatedTeam;
 		//teamsRepository.save(team);
 	}
 	
@@ -83,7 +118,6 @@ public class TeamServiceImpl implements TeamService {
 	}
 	@Override
 	public List<Team> getTeamsCaptains() {
-		List<Team> teamCapatains=teamsRepository.findByRole("CAPTAIN");
-		return teamCapatains;
+		return teamsRepository.findByPStatus("CAPTAIN");
 	}
 }

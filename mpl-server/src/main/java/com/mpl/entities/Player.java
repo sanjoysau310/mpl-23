@@ -12,13 +12,13 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 
 @Component
-@Document(collection = "players_test")
+@Document(collection = "mpl_2023_players")
 @Data
 @JsonIgnoreProperties
 public class Player {
 	
 	@Transient
-	public static final String SEQUENCE_NAME = "players_sequence";
+	public static final String SEQUENCE_NAME = "mpl_2023_players_seq";
 
 	@Id
 	private Integer pId;

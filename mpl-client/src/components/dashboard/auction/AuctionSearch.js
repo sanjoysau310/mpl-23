@@ -10,12 +10,11 @@ export default function AuctionSearch() {
   const searchPlayerById = async (e) => {
     e.preventDefault();
     navigate(`/playerauction/${pId}`);
-    await PrivateAPI.get(`/v1/player/payerid/${pId}`)
+    await PrivateAPI.get(`/v1/player/playerid/${pId}`)
       .then((res) => {
         navigate(`/playerauction/${pId}`);
       })
       .catch((err) => {
-        console.log(err);
         setMsg("Player not found with ID- " + pId);
       });
   };

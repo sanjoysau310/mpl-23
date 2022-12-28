@@ -16,7 +16,7 @@ const AuctionPurse = () => {
   ];
 
   const [teamsPlayers, setTeamsPlayers] = useState([]);
-  const [purse, setPurse] = useState(2000);
+  const [purse, setPurse] = useState(3000);
 
   const [timeLeft, setTimeLeft] = useState(60);
   const [reload, setReload] = useState(60);
@@ -75,20 +75,31 @@ const AuctionPurse = () => {
           return (
             <div className="col-lg-6 mb-3" key={teamName}>
               <div className="card bg-info">
-                <div className="card-block">
-                  <h3 className="text-center mb-3">{teamName}</h3>
-                  <div className="row text-center">
-                    <h5>Captain</h5>
+                <div className="card-block text-center">
+                  <h3 className="mb-3">{teamName}</h3>
+                  {teamsPlayers.map((teamPlayer) => (
+                    <h5 key={teamPlayer.pId}>
+                      {teamPlayer.pTeam === teamName
+                        ? teamPlayer.pStatus === "CAPTAIN"
+                          ? teamPlayer.pName
+                          : ""
+                        : ""}
+                    </h5>
+                  ))}
+                  <div className="row">
                     {teamsPlayers.map((teamPlayer) => {
                       if (teamPlayer.pTeam === teamName)
                         totalUsedPurse += teamPlayer.pSoldPrice;
                       return (
-                        <div className="col-lg-6" key={teamPlayer.pId}>
+                        <div className="col-md-6" key={teamPlayer.pId}>
                           {teamPlayer.pTeam === teamName ? (
-                            // <i style={{ fontSize: "12px" }}>
-                            <i>
-                              {teamPlayer.pName}-{teamPlayer.pSoldPrice}
-                            </i>
+                            teamPlayer.pStatus !== "CAPTAIN" ? (
+                              <i>
+                                {teamPlayer.pName}-{teamPlayer.pSoldPrice}
+                              </i>
+                            ) : (
+                              ""
+                            )
                           ) : (
                             ""
                           )}

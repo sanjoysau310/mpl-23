@@ -43,14 +43,14 @@ export default function TeamsPage() {
   return (
     <div className="container p-5">
       <h1 className="text-center p-5">Teams</h1>
-      <div className="row row-cols-5">
+      <div className="row">
         {teamNames.map((teamName) => (
-          <div className="col mb-3" key={teamName}>
+          <div className="col-sm-3 mb-3" key={teamName}>
             <div className="card bg-info">
               <div className="card-block">
                 <h3 className="text-center mb-3">{teamName}</h3>
                 <div className="row text-center">
-                  <h5>Captain</h5>
+                  <h5>Captain Names will be updated soon</h5>
                   {/* {playerNames.map((teamPlayer) => (
                     <div className="col-md-6" key={teamPlayer}>
                       {teamPlayer}

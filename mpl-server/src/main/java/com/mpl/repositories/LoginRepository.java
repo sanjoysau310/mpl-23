@@ -15,4 +15,7 @@ public interface LoginRepository extends MongoRepository<Login, String>{
 	
 	Optional<Login> findByUsername(String username);
 
+	@Query(value="{username :?0}", delete = true)
+	void deleteBypEmail(String username);
+
 }

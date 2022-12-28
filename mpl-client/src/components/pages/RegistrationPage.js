@@ -43,9 +43,9 @@ const RegistrationPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = async (e) => {
-    const re = /^[0-9\b]+$/;
+    const numberRegex = /^[0-9\b]+$/;
     if (e.target.name === "pPhone" || e.target.name === "pWhatsapp") {
-      if (e.target.value === "" || re.test(e.target.value)) {
+      if (e.target.value === "" || numberRegex.test(e.target.value)) {
         setPlayer({ ...player, [e.target.name]: e.target.value });
       }
     } else {
@@ -63,12 +63,18 @@ const RegistrationPage = () => {
 
   const handleValidation = (e) => {
     let { name, value } = e.target;
+    var passwordRegex = new RegExp(
+      "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8})"
+    );
     setError((prev) => {
       const stateObj = { ...prev, [name]: "" };
       switch (name) {
         case "pPassword":
           if (!value) {
             stateObj[name] = "Please enter Password.";
+          } else if (!passwordRegex.test(value)) {
+            stateObj[name] =
+              "Password should contain minimum 8 letter password, at least 1 special character, upper and lower case letters and number";
           } else if (
             player.pConfirmPassword &&
             value !== player.pConfirmPassword
@@ -86,6 +92,10 @@ const RegistrationPage = () => {
             stateObj[name] = "Please enter Confirm Password.";
           } else if (player.pPassword && value !== player.pPassword) {
             stateObj[name] = "Password and Confirm Password does not match.";
+          } else {
+            stateObj["confirmPassword"] = player.pConfirmPassword
+              ? ""
+              : error.pConfirmPassword;
           }
           break;
         default:
@@ -123,13 +133,12 @@ const RegistrationPage = () => {
     } else if (!checkEmail.data && checkPhone.data) {
       setErrorMessage("This Phone number has been registered already");
     } else if (!checkEmail.data && !checkPhone.data) {
-      setLoading(true);
-      const result = await PublicAPI.post("/v1/player/register", playerData);
-      result.data ? setLoading(false) : setLoading(true);
-      // player.pPaymentMode === "Online"
-      //   ? await navigate(`/pay/${result.data.pId}`)
-      //   : navigate("/successpage");
-      result.data ? navigate("/successpage") : navigate("/errorpage");
+      if (error.pPassword === "" && error.pConfirmPassword === "") {
+        setLoading(true);
+        const result = await PublicAPI.post("/v1/player/register", playerData);
+        result.data ? setLoading(false) : setLoading(true);
+        result.data ? navigate("/successpage") : navigate("/errorpage");
+      }
     }
   };
 
@@ -183,13 +192,11 @@ const RegistrationPage = () => {
                     name="pPassword"
                     className="form-control"
                     placeholder="Password"
+                    onBlur={handleValidation}
                     required
                   />
                   <div className="input-group-btn">
-                    <span
-                      className="btn btn-outline-secondary form-control"
-                      onClick={togglePassword}
-                    >
+                    <span className="form-control" onClick={togglePassword}>
                       {passwordType === "password" ? (
                         <i className="fa-solid fa-eye" />
                       ) : (

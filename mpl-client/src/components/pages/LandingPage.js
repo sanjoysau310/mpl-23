@@ -1,9 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-// import banner1 from "../../assets/images/banners/banner1.png";
-// import banner2 from "../../assets/images/banners/banner2.png";
-// import player1 from "../../assets/images/banners/player1.png";
-import player2 from "../../assets/images/banners/player2.png";
+import banner from "../../assets/images/banners/banner.png";
 // import rclLogo from "../../assets/images/logos/rcl.png";
 // import mplLogo from "../../assets/images/logos/mpl.png";
 
@@ -39,20 +36,17 @@ export const LandingPage = () => {
                 </Link>
               </div>
             </div>
-            <h2 className="mt-5 p-5">Event Dates- 21 and 22 January 2023</h2>
+            <h2 className="mt-5">Event Dates- 21 and 22 January 2023</h2>
             {/* <div className="logo d-flex justify-content-center p-5">
               <img src={rclLogo} alt="RCL" />
             </div> */}
           </div>
           <div
-            className="col-lg-6 order-1 order-lg-2 hero-img"
+            className="col-lg-6 order-1 order-lg-2 hero-img mt-1"
             data-aos="zoom-in"
             data-aos-delay={200}
           >
-            {/* <img src={banner1} className="img-fluid animated" alt="Banner1" />
-            <img src={banner} className="img-fluid animated" alt="Banner2" />
-            <img src={player1} className="img-fluid animated" alt="Banner3" /> */}
-            <img src={player2} className="img-fluid animated" alt="Banner4" />
+            <img src={banner} className="img-fluid animated" alt="Banner" />
           </div>
         </div>
       </div>
